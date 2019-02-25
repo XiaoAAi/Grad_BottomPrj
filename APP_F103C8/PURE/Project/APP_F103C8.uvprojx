@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>APP_F103R8_Test</TargetName>
+      <TargetName>APP_F103C8_Test</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
@@ -53,7 +53,7 @@
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
+          <DebugInformation>0</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>..\Listing\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
@@ -412,31 +412,6 @@
               <FilePath>..\User\main.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f10x_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\stm32f10x_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_sys.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_gpio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\BSP\bsp_gpio.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_common.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BSP\bsp_common.c</FilePath>
@@ -465,6 +440,41 @@
               <FileName>bsp_timer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\BSP\bsp_timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_delay.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_sys.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_sys.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\stm32f10x_it.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -591,10 +601,10 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>APP_F103R8_Update</TargetName>
+      <TargetName>APP_F103C8_Update</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -664,7 +674,7 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>1</RunUserProg1>
+            <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>1</RunUserProg2>
             <UserProg1Name>C:\Keil_v5\ARM\ARMCLANG\bin\fromelf.exe --bin -o ../Output/release.bin ../Output/release.axf</UserProg1Name>
             <UserProg2Name>CopyHex.bat</UserProg2Name>
@@ -921,7 +931,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER,DUISHE_SYS_UPDATE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\BSP;..\Libraries\CMSIS;..\Libraries\FWLIB\inc;..\User</IncludePath>
+              <IncludePath>..\..\BSP;..\Libraries\CMSIS;..\Libraries\FWLIB\inc;..\User;..\..\BSP</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -996,31 +1006,6 @@
               <FilePath>..\User\main.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f10x_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\stm32f10x_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_sys.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_gpio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\BSP\bsp_gpio.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_common.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BSP\bsp_common.c</FilePath>
@@ -1049,6 +1034,41 @@
               <FileName>bsp_timer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\BSP\bsp_timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_delay.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_delay.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_sys.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_sys.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\stm32f10x_it.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -7,17 +7,14 @@
 #include <stdlib.h>
 #include "stm32f10x_conf.h"
 #include "stm32f10x.h"
-
-
-
-#if SYSTEM_SUPPORT_UCOS
-#include "includes.h"
-#endif
+#include <core_cm3.h>
 
 typedef enum
 {
     FALSE = 0, TRUE = 1
 } bool;
+
+extern char strtemp[128];
 
 #include "bsp_usart.h"
 #include "bsp_gpio.h"
@@ -25,9 +22,12 @@ typedef enum
 #include "bsp_delay.h"
 #include "bsp_sys.h"
 
+
+
 #define HBYTE(a)               ((unsigned char)(((unsigned short)(a) >> 8) & 0xFF))
 #define LBYTE(a)               ((unsigned char)((unsigned short)(a)& 0xff))
-#define MAKEWORD(bLow,bHigh)   ((unsigned short)(((unsigned char)(bLow))|(((unsigned short)((unsigned char)(bHigh)))<<8)))
+#define MAKEWORD(bHigh, bLow)   ((unsigned short)((((unsigned short)((unsigned char)(bHigh)))<<8)) | ((unsigned char)(bLow)))
+
 
 //版本号及前缀
 #define   Prefix            "HJG_HY"    //前缀，区分不同机型
@@ -35,21 +35,18 @@ typedef enum
 #define   Version_Month     "08"      // month
 #define   Version_Day       "04"      // day
 
-//红外对射检测方案选择，方案1：对应层检测到阻挡就发送回馈；方案2：检测到阻挡，需要再次接收到红外光才能电机停止，对应红酒柜结构
-//#define DUISHE_VER      1
-
-unsigned short CRC16_isr(unsigned char *Dat, unsigned int len);
-bool strLenCmp(char *cmd1, char *cmd2, u8 len);
-bool strLenCpy(char *dst, char *src, u8 len);
-u8 strLen(char *cmd);
-
-void delay_init(void);
-void delay_ms(u16 nms);
-void delay_us(u32 nus);
 
 
-//用于各个文件打印调试信息
-extern u8 strtemp[128];
+
+
+
+
+//函数定义
+unsigned short ModBusCRC(unsigned char *pData, unsigned int siLen);
+
+
+
+
 
 #endif  //_BSP_COMMON_H
 
