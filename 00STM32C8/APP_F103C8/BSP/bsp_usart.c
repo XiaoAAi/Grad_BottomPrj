@@ -156,20 +156,20 @@ u8 IAP_Read_UpdateFLAG(void)
 
 }
 
-void Send_CMD(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD)//无数据区数据包
+void SendCmd(USART_TypeDef* USARTx, u16 cmd)//无数据区数据包
 {
     u8 str[8] = {0};
     u8 cnt = 0;
     u16 ncrc = 0;
-    str[0] = HCMD;
-    str[1] = LCMD;
+    str[0] = HBYTE(cmd);
+    str[1] = LBYTE(cmd);
     str[2] = 0;
     str[3] = 2;
     ncrc = ModBusCRC(&str[0], 4);
     str[4] = HBYTE(ncrc);
     str[5] = LBYTE(ncrc);
-    str[6] = 0x0D;
-    str[7] = 0x0A;
+    str[6] = 0xDD;
+    str[7] = 0xEE;
 
     for(cnt = 0; cnt < 8; cnt++)
     {
@@ -177,14 +177,14 @@ void Send_CMD(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD)//无数据区数据包
     }
 }
 
-void Send_CMD_DAT(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD, char *dat, u16 dat_len)//完整数据包
+void SendCmdDat(USART_TypeDef* USARTx, u16 cmd, char *dat, u16 dat_len)//完整数据包
 {
     u8 cnt = 0;
     u16 ncrc = 0;
-    u8 str[255] = {0};
+    u8 str[512] = {0};
     u16 datalen = 0;
-    str[0] = HCMD;
-    str[1] = LCMD;
+    str[0] = HBYTE(cmd);
+    str[1] = LBYTE(cmd);
     memcpy(&str[2], &dat[0], dat_len);
     datalen = dat_len + 2;
     str[dat_len + 2] = HBYTE(datalen);
@@ -192,8 +192,8 @@ void Send_CMD_DAT(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD, char *dat, u16 dat_le
     ncrc = ModBusCRC(&str[0], 4 + dat_len);
     str[dat_len + 4] = HBYTE(ncrc);
     str[dat_len + 5] = LBYTE(ncrc);
-    str[dat_len + 6] = 0x0D;
-    str[dat_len + 7] = 0x0A;
+    str[dat_len + 6] = 0xDD;
+    str[dat_len + 7] = 0xEE;
 
     for(cnt = 0; cnt < 8 + dat_len; cnt++)
     {
@@ -203,15 +203,15 @@ void Send_CMD_DAT(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD, char *dat, u16 dat_le
 
 u8 USART_BufferRead(u8 *data)
 {
-	u8 ret = 0;
-    if(UsartRptr != UsartWptr) // empty
+    if(UsartRptr == UsartWptr) // empty
     {
-        *data = UsartBuffer[UsartRptr];
-		UsartRptr = (UsartRptr + 1) % USART_BUFFER_LEN;
-		ret = 1; 		
+		return 0;	
     }
-
-    return ret;
+	*data = UsartBuffer[UsartRptr];
+	UsartRptr = (UsartRptr + 1) % USART_BUFFER_LEN;
+//	sprintf(strtemp, "Data:%X\r\n", *data);
+//	USART_DEBUG(strtemp);
+	return 1;
 }
 
 //写入数据 + 接收中断处理
@@ -224,11 +224,13 @@ void USART_BufferWrite(u8 ntemp)
 
     UsartBuffer[UsartWptr] = ntemp;
 
-    if(UsartBuffer[UsartWptr] == 0x0A && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 1) % USART_BUFFER_LEN] == 0x0D
-            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 2) % USART_BUFFER_LEN] == 0xC1 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 3) % USART_BUFFER_LEN] == 0x81
+    if(UsartBuffer[UsartWptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 1) % USART_BUFFER_LEN] == 0xDD
+            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 2) % USART_BUFFER_LEN] == 0xDA && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 3) % USART_BUFFER_LEN] == 0xE1
             && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 5) % USART_BUFFER_LEN] == 0x00
-            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 6) % USART_BUFFER_LEN] == 0x14 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 7) % USART_BUFFER_LEN] == 0x03)
+            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 6) % USART_BUFFER_LEN] == 0x0E && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 7) % USART_BUFFER_LEN] == 0x01)
     {
+		SendCmd(USART2, USART_SERVER_BUTTOM_ResetButtom);			//发送板子重启反馈
+		USART_SendBytes(USART1, (u8*)"ButtomLayerReset\r\n", 19);	//做打印也做延时
         //复位对射
         __disable_irq();
         NVIC_SystemReset();
@@ -243,7 +245,18 @@ void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
 	USART_DEBUG(strtemp);
 	
-	
+	if(cmd == USART_SERVER_BUTTOM_WillUpdate) //准备升级对射
+	{
+		SendCmd(USART2, USART_SERVER_BUTTOM_WillUpdateFeedBack);
+		USART_SendBytes(USART1, (u8*)"WillUpdateButtom\r\n", 18);			//做打印也做延时
+		IAP_Reset_UpdateFLAG();
+		__disable_irq();
+		NVIC_SystemReset();
+	}
+	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
+	{
+		USART_DEBUG("OpenLightCol\r\n");
+	}
 	
 	
 }

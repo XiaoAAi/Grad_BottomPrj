@@ -10,35 +10,35 @@
 #define USART1_CONFIG_ENABLED                (1)
 #define USART2_CONFIG_ENABLED                (1)
 #define USART3_CONFIG_ENABLED                (0)
-#define UART4_CONFIG_ENABLED                 (0)
-#define UART5_CONFIG_ENABLED                 (0)
+
 
 //定义串口波特率
-#define USART1_BAUDRATE                       115200
-#define USART2_BAUDRATE                       115200
-#define USART3_BAUDRATE                       115200
-#define UART4_BAUDRATE                        115200
-#define UART5_BAUDRATE                        115200
+#define USART1_BAUDRATE                       9600
+#define USART2_BAUDRATE                       9600
+#define USART3_BAUDRATE                       9600
 
-void USART_SendByte(USART_TypeDef* USARTx, uint8_t byte);
-void USART_SendBytes(USART_TypeDef* USARTx, uint8_t *str, uint8_t len);
-void USART_SendBytess(USART_TypeDef* USARTx, char *str);
 
-void USART_BufferWrite(u8 ntemp);
-u8 USART_BufferRead(u8 *data);
-void Send_CMD(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD);
-void Send_CMD_DAT(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD, char *dat, u16 dat_len);
+
 /**********************************************************/
 #define None_Flash_Bod        0
 #define Start_Flash_Bod       1
 #define Stop_Flash_Bod        2
 /**********************************************************/
-////////对射
-#define USARTCMD_DIANJI_DUISHE_WillUpdateDuishe       0x035B
-#define USARTCMD_DIANJI_DUISHE_StartUpdateDuishe      0x035F
-#define USARTCMD_DIANJI_DUISHE_StopUpdateDuishe       0x035C
-#define USARTCMD_DIANJI_DUISHE_GetDuisheVer           0x034C
+
+
+
+//升级指令
+#define  USART_SERVER_BUTTOM_WillUpdate					0x01AD	//将要升级
+#define  USART_SERVER_BUTTOM_WillUpdateFeedBack			0x01BD	//将要升级回馈
+#define  USART_SERVER_BUTTOM_StartUpdate				0x01AE	//开始升级
+#define  USART_SERVER_BUTTOM_StartUpdateFeedBack		0x01BE	//开始升级回馈
+#define  USART_SERVER_BUTTOM_StopUpdate					0x01AF	//停止升级
+#define  USART_SERVER_BUTTOM_StopUpdateFeedBack			0x01BF	//停止升级回馈
+
+//重启指令
+#define  USART_SERVER_BUTTOM_ResetButtom				0x010E	//重启底层板子及回馈
 /**********************************************************/
+
 #if defined (STM32F10X_MD) || defined (STM32F10X_MD_VL)
 #define PAGE_SIZE                         (0x400)    // 1 Kbyte
 #define FLASH_SIZE                        (0x20000)  // 128 KBytes
@@ -71,7 +71,14 @@ void IAP_Start_Program_Flash_Init(void);
 void IAP_Start_Program_Flash(u8 data);
 void IAP_JumpToApplication(void);
 void IAP_JumpToIAP(void);
-void Handle_USART_CMD(u16 Data, char *Dat, u16 dat_len);
+void USART_SendByte(USART_TypeDef* USARTx, uint8_t byte);
+void USART_SendBytes(USART_TypeDef* USARTx, uint8_t *str, uint8_t len);
+void USART_SendBytess(USART_TypeDef* USARTx, char *str);
+void USART_BufferWrite(u8 ntemp);
+u8 USART_BufferRead(u8 *data);
+void SendCmd(USART_TypeDef* USARTx, u16 cmd);								//发送不带数据区的数据包
+void SendCmdDat(USART_TypeDef* USARTx, u16 cmd, char *dat, u16 dat_len);	//发送带数据区的数据包
+void HandleDatCmd(u16 cmd, char* dat, u16 datLen);
 /**********************************************************/
 #endif  //_BSP_USART_H
 

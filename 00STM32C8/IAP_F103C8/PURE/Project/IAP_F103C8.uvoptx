@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>IAP_F103R8</TargetName>
+    <TargetName>IAP_F103C8</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>

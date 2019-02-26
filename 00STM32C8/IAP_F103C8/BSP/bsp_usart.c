@@ -20,48 +20,15 @@ u8 USART_BufferRead(u8 *data)
 {
     if(UsartRptr == UsartWptr) // empty
     {
-        return 0;
+		return 0;	
     }
-
-    *data = UsartBuffer[UsartRptr];
-    //UsartRptr++;
-    UsartRptr = (UsartRptr + 1) % USART_BUFFER_LEN;
-    return 1;
+	*data = UsartBuffer[UsartRptr];
+	UsartRptr = (UsartRptr + 1) % USART_BUFFER_LEN;
+//	sprintf(strtemp, "Data:%X\r\n", *data);
+//	USART_DEBUG(strtemp);
+	return 1;
 }
 
-void USART_BufferWrite(u8 ntemp)
-{
-    if((UsartWptr + 1) % USART_BUFFER_LEN == UsartRptr) // full
-    {
-        return;
-    }
-
-    UsartBuffer[UsartWptr] = ntemp;
-
-    if(UsartBuffer[UsartWptr] == 0x0A && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 1) % USART_BUFFER_LEN] == 0x0D
-            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 2) % USART_BUFFER_LEN] == 0xC1 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 3) % USART_BUFFER_LEN] == 0x81
-            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 5) % USART_BUFFER_LEN] == 0x00
-            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 6) % USART_BUFFER_LEN] == 0x14 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 7) % USART_BUFFER_LEN] == 0x03)
-    {
-        // 复位
-        flag_dis_jump = 1;
-        start_flash_flag = None_Flash_Bod;
-        __disable_irq();
-        NVIC_SystemReset();
-    }
-
-    //UsartWptr++;
-    //UsartWptr = UsartWptr % USART_BUFFER_LEN;
-    UsartWptr = (UsartWptr + 1) % USART_BUFFER_LEN;
-
-    if(UsartBuffer[UsartRptr] == 0x0A && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 1) % USART_BUFFER_LEN] == 0x0D
-            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 2) % USART_BUFFER_LEN] == 0x41 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 3) % USART_BUFFER_LEN] == 0x97
-            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 5) % USART_BUFFER_LEN] == 0x00
-            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 6) % USART_BUFFER_LEN] == 0x5C && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 7) % USART_BUFFER_LEN] == 0x03)
-    {
-        start_flash_flag = Stop_Flash_Bod;  //结束升级
-    }
-}
 
 /*
 *********************************************************************************************************
@@ -156,61 +123,7 @@ void USART3_IRQHandler(void)
 }
 #endif
 
-#if UART4_CONFIG_ENABLED > 0
-void UART4_IRQHandler(void)
-{
-    uint8_t nTemp;
-#if SYSTEM_SUPPORT_UCOS
-    OSIntEnter();
-#endif
 
-    if(USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
-    {
-        nTemp = USART_ReceiveData(UART4);
-        USART_ClearITPendingBit(UART4, USART_IT_RXNE); //clear flag
-        /************************************************/
-        //USART_BufferWrite(nTemp);
-    }
-
-    if(USART_GetFlagStatus(UART4, USART_FLAG_ORE) == SET) //overflow
-    {
-        USART_ReceiveData(UART4);    // delete data
-        USART_ClearFlag(UART4, USART_FLAG_ORE);
-    }
-
-#if SYSTEM_SUPPORT_UCOS
-    OSIntExit();
-#endif
-}
-#endif
-
-#if UART5_CONFIG_ENABLED > 0
-void UART5_IRQHandler(void)
-{
-    uint8_t nTemp;
-#if SYSTEM_SUPPORT_UCOS
-    OSIntEnter();
-#endif
-
-    if(USART_GetITStatus(UART5, USART_IT_RXNE) != RESET)
-    {
-        nTemp = USART_ReceiveData(UART5);
-        USART_ClearITPendingBit(UART5, USART_IT_RXNE); //clear flag
-        /************************************************/
-        //USART_BufferWrite(nTemp);
-    }
-
-    if(USART_GetFlagStatus(UART5, USART_FLAG_ORE) == SET) //overflow
-    {
-        USART_ReceiveData(UART5);    // delete data
-        USART_ClearFlag(UART5, USART_FLAG_ORE);
-    }
-
-#if SYSTEM_SUPPORT_UCOS
-    OSIntExit();
-#endif
-}
-#endif
 
 //USART发送单字节
 void USART_SendByte(USART_TypeDef* USARTx, uint8_t byte)
@@ -242,20 +155,20 @@ void USART_SendBytess(USART_TypeDef* USARTx, char *str)
     }
 }
 
-void Send_CMD(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD)
+void SendCmd(USART_TypeDef* USARTx, u16 cmd)//无数据区数据包
 {
     u8 str[8] = {0};
     u8 cnt = 0;
     u16 ncrc = 0;
-    str[0] = HCMD;
-    str[1] = LCMD;
+    str[0] = HBYTE(cmd);
+    str[1] = LBYTE(cmd);
     str[2] = 0;
     str[3] = 2;
-    ncrc = CRC16_isr(&str[0], 4);
+    ncrc = ModBusCRC(&str[0], 4);
     str[4] = HBYTE(ncrc);
     str[5] = LBYTE(ncrc);
-    str[6] = 0x0D;
-    str[7] = 0x0A;
+    str[6] = 0xDD;
+    str[7] = 0xEE;
 
     for(cnt = 0; cnt < 8; cnt++)
     {
@@ -263,23 +176,23 @@ void Send_CMD(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD)
     }
 }
 
-void Send_CMD_DAT(USART_TypeDef* USARTx, u8 HCMD, u8 LCMD, char *dat, u16 dat_len)
+void SendCmdDat(USART_TypeDef* USARTx, u16 cmd, char *dat, u16 dat_len)//完整数据包
 {
     u8 cnt = 0;
     u16 ncrc = 0;
-    u8 str[255] = {0};
+    u8 str[512] = {0};
     u16 datalen = 0;
-    str[0] = HCMD;
-    str[1] = LCMD;
+    str[0] = HBYTE(cmd);
+    str[1] = LBYTE(cmd);
     memcpy(&str[2], &dat[0], dat_len);
     datalen = dat_len + 2;
     str[dat_len + 2] = HBYTE(datalen);
     str[dat_len + 3] = LBYTE(datalen);
-    ncrc = CRC16_isr(&str[0], 4 + dat_len);
+    ncrc = ModBusCRC(&str[0], 4 + dat_len);
     str[dat_len + 4] = HBYTE(ncrc);
     str[dat_len + 5] = LBYTE(ncrc);
-    str[dat_len + 6] = 0x0D;
-    str[dat_len + 7] = 0x0A;
+    str[dat_len + 6] = 0xDD;
+    str[dat_len + 7] = 0xEE;
 
     for(cnt = 0; cnt < 8 + dat_len; cnt++)
     {
@@ -423,41 +336,62 @@ void IAP_JumpToIAP(void)
     Jump_To_Application(); //跳转回IAP代码处
 }
 
-void Handle_USART_CMD(u16 Data, char *Dat, u16 dat_len)
+void USART_BufferWrite(u8 ntemp)
 {
-    if(dat_len != 0) // 处理数据区域
+    if((UsartWptr + 1) % USART_BUFFER_LEN == UsartRptr) // full
     {
+        return;
     }
-    else  // 处理指令
+
+    UsartBuffer[UsartWptr] = ntemp;
+
+    if(UsartBuffer[UsartWptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 1) % USART_BUFFER_LEN] == 0xDD
+            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 2) % USART_BUFFER_LEN] == 0xDA && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 3) % USART_BUFFER_LEN] == 0xE1
+            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 5) % USART_BUFFER_LEN] == 0x00
+            && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 6) % USART_BUFFER_LEN] == 0x0E && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 7) % USART_BUFFER_LEN] == 0x01)
     {
-        if(Data == USARTCMD_DIANJI_DUISHE_WillUpdateDuishe) // will升级对射
-        {
-            flag_dis_jump = 1;
-            Send_CMD(USART2, 0x03, LBYTE(USARTCMD_DIANJI_DUISHE_WillUpdateDuishe));
-            USART_SendBytess(USART1, "will update\r\n");
-        }
-        else if(Data == USARTCMD_DIANJI_DUISHE_StartUpdateDuishe) // 开始升级对射
-        {
-            flag_dis_jump = 0;
-            start_flash_flag = Start_Flash_Bod;
-            IAP_Start_Program_Flash_Init();
-            Send_CMD(USART2, 0x03, LBYTE(USARTCMD_DIANJI_DUISHE_StartUpdateDuishe));
-            USART_SendBytess(USART1, "start update\r\n");
-        }
-        else if(Data == USARTCMD_DIANJI_DUISHE_GetDuisheVer) // 获取对射版本
-        {
-            char strstr[16] = {0};
-            sprintf(strstr, "%s.%s%s", Version_Year, Version_Month, Version_Day);
-            Send_CMD_DAT(USART2, 0x03, LBYTE(USARTCMD_DIANJI_DUISHE_GetDuisheVer), strstr, 7);
-            USART_SendBytess(USART1, strstr);
-        }
-        else if(Data == 0x0117) // 初始化flash标志位，打开进入APP
-        {
-            USART_SendBytess(USART1, "init Duishe\r\n");
-            IAP_Write_UpdateFLAG();
-            __disable_irq();
-            NVIC_SystemReset();
-        }
+		SendCmd(USART2, USART_SERVER_BUTTOM_ResetButtom);			//发送板子重启反馈
+		USART_SendBytes(USART1, (u8*)"ButtomLayerReset\r\n", 19);	//做打印也做延时
+        //复位对射
+        __disable_irq();
+        NVIC_SystemReset();
+    }
+
+    UsartWptr = (UsartWptr + 1) % USART_BUFFER_LEN;
+
+	//升级结束
+    if(UsartBuffer[UsartRptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 1) % USART_BUFFER_LEN] == 0xDD
+            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 2) % USART_BUFFER_LEN] == 0x38 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 3) % USART_BUFFER_LEN] == 0xB0
+            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 5) % USART_BUFFER_LEN] == 0x00
+            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 6) % USART_BUFFER_LEN] == 0xAF && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 7) % USART_BUFFER_LEN] == 0x01)
+    {
+        start_flash_flag = Stop_Flash_Bod;  //结束升级
+		SendCmd(USART2, USART_SERVER_BUTTOM_StopUpdateFeedBack);			//发送板子升级结束
     }
 }
+
+//功能：主要用于指令的处理
+void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
+{
+	char strtemp[100] = {0};
+	sprintf(strtemp, "Cmd: %X\r\n", cmd);
+	USART_SendBytess(USART1, strtemp);
+	
+	if(cmd == USART_SERVER_BUTTOM_WillUpdate) //准备升级对射
+	{
+		flag_dis_jump = 1;
+		SendCmd(USART2, USART_SERVER_BUTTOM_WillUpdateFeedBack);
+		USART_SendBytes(USART1, (u8*)"WillUpdateButtom\r\n", 18);			//做打印也做延时
+	}
+	else if(cmd == USART_SERVER_BUTTOM_StartUpdate) // 开始升级对射
+	{
+		flag_dis_jump = 0;
+		start_flash_flag = Start_Flash_Bod;
+		IAP_Start_Program_Flash_Init();
+		SendCmd(USART2, USART_SERVER_BUTTOM_StartUpdateFeedBack);
+		USART_SendBytes(USART1, (u8*)"StartUpdateButtom\r\n", 18);
+	}	
+	
+}
+
 
