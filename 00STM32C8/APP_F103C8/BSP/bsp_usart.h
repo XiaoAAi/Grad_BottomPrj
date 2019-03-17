@@ -22,7 +22,7 @@
 
 //定义串口波特率
 #define USART1_BAUDRATE                       9600
-#define USART2_BAUDRATE                       9600
+#define USART2_BAUDRATE                       115200
 #define USART3_BAUDRATE                       9600
 
 
@@ -53,6 +53,7 @@
 //函数接口
 void USART_SendByte(USART_TypeDef* USARTx, uint8_t byte);
 void USART_SendBytes(USART_TypeDef* USARTx, uint8_t *str, uint8_t len);
+void USART_SendBytess(USART_TypeDef* USARTx, char *str);
 u8 USART_BufferRead(u8 *data);
 void USART_BufferWrite(u8 ntemp);
 void IAP_Write_UpdateFLAG(void);

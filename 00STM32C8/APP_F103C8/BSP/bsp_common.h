@@ -21,6 +21,8 @@ extern char strtemp[128];
 #include "bsp_timer.h"
 #include "bsp_delay.h"
 #include "bsp_sys.h"
+#include "bsp_led.h"
+#include "bsp_wifi.h"
 
 
 
