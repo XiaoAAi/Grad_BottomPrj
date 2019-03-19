@@ -3,6 +3,7 @@
 bool flagEnableDebug = TRUE;		//DEBUG打印
 
 u8 UsartBuffer[USART_BUFFER_LEN] = {0}; //数据缓冲区
+char ATBuffer[AT_BUFFER_LEN] = {0}; //数据缓冲区
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
 
@@ -223,6 +224,7 @@ void USART_BufferWrite(u8 ntemp)
     }
 
     UsartBuffer[UsartWptr] = ntemp;
+		ATBuffer[UsartWptr] = ntemp;//AT指令测试专用
 
     if(UsartBuffer[UsartWptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 1) % USART_BUFFER_LEN] == 0xDD
             && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 2) % USART_BUFFER_LEN] == 0xDA && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 3) % USART_BUFFER_LEN] == 0xE1

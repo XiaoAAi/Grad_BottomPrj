@@ -31,6 +31,7 @@ int main(void)
     }
 
 #endif
+
  wifi_start_trans();
  USART_SendBytess(USART1,"wifi tou chuan jie shu");
 	while(1)

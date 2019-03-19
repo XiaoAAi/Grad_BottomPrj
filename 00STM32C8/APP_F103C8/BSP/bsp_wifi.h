@@ -7,5 +7,7 @@
 u8* esp8266_check_cmd(char *str);
 void wifi_start_trans(void);//WiFi开启透传模式
 
+void uart_restr(char *str);
+
 #endif
 
