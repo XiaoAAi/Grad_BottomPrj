@@ -21,9 +21,9 @@ extern char strtemp[128];
 #include "bsp_timer.h"
 #include "bsp_delay.h"
 #include "bsp_sys.h"
-#include "bsp_led.h"
+#include "bsp_oled.h"
 #include "bsp_wifi.h"
-
+#include "bsp_dht22.h"
 
 
 #define HBYTE(a)               ((unsigned char)(((unsigned short)(a) >> 8) & 0xFF))

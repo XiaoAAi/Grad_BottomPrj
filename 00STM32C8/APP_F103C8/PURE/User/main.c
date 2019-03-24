@@ -11,6 +11,7 @@ int main(void)
 	u8 ndat[512] = {0};
 	u16 ncrc = 0;
 	u16 ncmd = 0;
+	u8 humi,temp;
 #if SYS_ENABLE_IAP
     SCB->VTOR = 0x8002000;
     __enable_irq();
@@ -20,6 +21,7 @@ int main(void)
     USART_Configure();
     NVIC_Configure();
 	TIM3_Int_Init(999, 7199);	//100ms
+	OLED_Init();//oled初始化
 	
 	sprintf(strtemp, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, Version_Day);
 	USART_SendBytes(USART1, (u8*)strtemp, sizeof(strtemp));			//打印版本信息
@@ -31,11 +33,26 @@ int main(void)
     }
 
 #endif
+//读取DHT22数据
+	while(!DHT22_Read_Data(&humi,&temp))
+{
+	delay_ms(1000);
+	delay_ms(1000);
+	delay_ms(1000);
+}
+	
+	USART_DEBUG("shi du shi:");
+	USART_SendByte(USART1,humi);
+	USART_DEBUG("wen du shi:");
+	USART_SendByte(USART1,temp);
 
  wifi_start_trans();
+ //OLED_Print_Num(30,1,666);
  USART_SendBytess(USART1,"wifi tou chuan jie shu");
 	while(1)
 	{
+//		OLED_P6x8Str(0,0,(u8 *)"Temperature is");
+//		OLED_Print_Num(30,1,666);
 		if(USART_BufferRead(&data) != 0)
 		{
 			ntemp[((++cnt) % 512)] = data;

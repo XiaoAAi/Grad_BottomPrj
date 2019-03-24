@@ -477,16 +477,6 @@
               <FilePath>..\User\stm32f10x_it.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_led.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_led.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\BSP\bsp_led.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_wifi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BSP\bsp_wifi.c</FilePath>
@@ -495,6 +485,26 @@
               <FileName>bsp_wifi.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\BSP\bsp_wifi.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_oled.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_oled.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_dht22.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_dht22.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_dht22.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_dht22.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1091,16 +1101,6 @@
               <FilePath>..\User\stm32f10x_it.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_led.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_led.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\BSP\bsp_led.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_wifi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BSP\bsp_wifi.c</FilePath>
@@ -1109,6 +1109,26 @@
               <FileName>bsp_wifi.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\BSP\bsp_wifi.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_oled.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_oled.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_dht22.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_dht22.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_dht22.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\BSP\bsp_dht22.h</FilePath>
             </File>
           </Files>
         </Group>
