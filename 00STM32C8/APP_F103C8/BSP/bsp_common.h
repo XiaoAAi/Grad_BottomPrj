@@ -31,6 +31,7 @@ extern char strtemp[128];
 #define MAKEWORD(bHigh, bLow)   ((unsigned short)((((unsigned short)((unsigned char)(bHigh)))<<8)) | ((unsigned char)(bLow)))
 
 
+
 //版本号及前缀
 #define   Prefix            "APP_BUTTOM"    //前缀，区分不同机型
 #define   Version_Year      "19"       // year

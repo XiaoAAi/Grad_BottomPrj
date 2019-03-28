@@ -11,13 +11,11 @@
 
 
 
-#define  OLED_SCL_PIN	 	12
-#define  OLED_SDA_PIN	 	13
-#define  OLED_RST_PIN	 	14
-#define  OLED_DC_PIN		15
-#define  OLED_CS_PIN	 	8
-
-
+#define		OLED_SCL(x)			PBout(12)=x
+#define 	OLED_SDA(x)  		PBout(13)=x
+#define 	OLED_RST(x)  		PBout(14)=x
+#define 	OLED_DC(x)   		PBout(15)=x
+#define 	OLED_CS(x)   		PAout(8)=x
 
 void OLED_Init(void);
 void OLED_Fill(u8 bmp_data);

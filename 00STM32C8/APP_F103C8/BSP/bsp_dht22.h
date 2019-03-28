@@ -16,7 +16,7 @@
 														
 			
 
-u8 DHT22_Read_Data(u8 *humi,u8 *temp);	//DHT22读取温度
+u8 DHT22_Read_Data(u16 *humi,u16 *temp);	//DHT22读取温度
 
 #endif
 

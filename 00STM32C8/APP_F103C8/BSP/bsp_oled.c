@@ -65,14 +65,9 @@ void TIM2_PWM_init(u16 arr,u16 psc)
 #define	Brightness	0xCF
 
 
-#define X_WIDTH 128
+#define X_WIDTH 129
 #define Y_WIDTH 64
 
-#define OLED_SCL(x)  GPIOB_set (OLED_SCL_PIN	, x)
-#define OLED_SDA(x)  GPIOB_set (OLED_SDA_PIN	, x)
-#define OLED_RST(x)  GPIOB_set (OLED_RST_PIN	, x)
-#define OLED_DC(x)   GPIOB_set (OLED_DC_PIN		, x)
-#define OLED_CS(x)   GPIOB_set (OLED_CS_PIN  	, x)
 
 const u8 F6x8[][6] =
 {

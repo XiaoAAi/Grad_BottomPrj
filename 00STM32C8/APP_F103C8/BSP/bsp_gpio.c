@@ -1,6 +1,6 @@
 #include "bsp_common.h"
 
-
+u16 led_falg=10000;
 
 void GPIO_Configure(void)
 {
@@ -17,23 +17,23 @@ void GPIO_Configure(void)
 	
 	//DHT22温湿度传感器引脚B8
 	//OLED引脚配置
-	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8;
+	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	GPIO_SetBits(GPIOB,GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8);//设置为高电平
+	GPIO_SetBits(GPIOB,GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8);//设置为高电平
 	
-//	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_12|GPIO_Pin_13;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  //复用推挽输出
-//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_Init(GPIOB, &GPIO_InitStructure);
-//	GPIO_SetBits(GPIOB,GPIO_Pin_12|GPIO_Pin_13);
-//	
-//	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_Init(GPIOA, &GPIO_InitStructure);
-//	GPIO_ResetBits(GPIOA,GPIO_Pin_8);	
+	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8|GPIO_Pin_7;//A8引脚用于OLED
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_ResetBits(GPIOA,GPIO_Pin_8);	
+	
+	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_4;//A8引脚用于OLED屏幕，A7用于人体传感器指示灯
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	//GPIO_ResetBits(GPIOA,GPIO_Pin_7);	
 	
 }
 
@@ -198,11 +198,37 @@ void NVIC_Configure(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //IRQ通道被使能
     NVIC_Init(&NVIC_InitStructure);  //根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器
 #endif
+
+#if EXTI_CONFIG_ENABLED > 0
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;             //A4中断
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;   //先占优先级1级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;          //从优先级3级
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //IRQ通道被使能
+    NVIC_Init(&NVIC_InitStructure);  //根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器
+#endif
 }
 
-
-
-
+void EXTIX_Init(void)
+{
+	EXTI_InitTypeDef EXTI_initStructure;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);//使能AFIO复用时钟功能：	
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA,GPIO_PinSource4);
+	EXTI_initStructure.EXTI_Line=EXTI_Line4;
+	EXTI_initStructure.EXTI_Mode = EXTI_Mode_Interrupt;//中断模式，可选值为中断 EXTI_Mode_Interrupt 和事件 EXTI_Mode_Event。
+	EXTI_initStructure.EXTI_Trigger = EXTI_Trigger_Rising;//触发方式，可以是下降沿触发 EXTI_Trigger_Falling，上升沿触发 EXTI_Trigger_Rising，或者任意电平（上升沿和下降沿）触发EXTI_Trigger_Rising_Falling
+	EXTI_initStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_initStructure);//根据结构体信息进行初始化
+	
+}
+//外部引脚A8中断服务例程
+void EXTI4_IRQHandler(void)
+{
+	//delay_ms(1000);
+  //USART_DEBUG("ren ti chuan gan qi zhongduan\r\n");
+		PAout(7)=1;
+		//led_falg=10000;
+    EXTI_ClearITPendingBit(EXTI_Line4);//清楚中断标志
+}
 
 
 

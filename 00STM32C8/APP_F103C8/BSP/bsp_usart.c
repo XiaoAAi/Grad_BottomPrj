@@ -1,9 +1,10 @@
 #include "bsp_common.h"
-
+#include	<stdarg.h>
 bool flagEnableDebug = TRUE;		//DEBUG打印
 
 u8 UsartBuffer[USART_BUFFER_LEN] = {0}; //数据缓冲区
 char ATBuffer[AT_BUFFER_LEN] = {0}; //数据缓冲区
+u8  USART3_TX_BUF[USART3_MAX_SEND_LEN]; 			//发送缓冲,最大USART3_MAX_SEND_LEN字节
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
 
@@ -224,7 +225,7 @@ void USART_BufferWrite(u8 ntemp)
     }
 
     UsartBuffer[UsartWptr] = ntemp;
-		ATBuffer[UsartWptr] = ntemp;//AT指令测试专用
+		//ATBuffer[UsartWptr] = ntemp;//AT指令测试专用
 
     if(UsartBuffer[UsartWptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 1) % USART_BUFFER_LEN] == 0xDD
             && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 2) % USART_BUFFER_LEN] == 0xDA && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 3) % USART_BUFFER_LEN] == 0xE1
@@ -259,10 +260,31 @@ void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
 	{
 		USART_DEBUG("OpenLightCol\r\n");
 	}
+	else if(cmd==USART_SERVER_BUTTOM_LCDShow)
+	{
+		OLED_P6x8Str(0,0,(u8 *)dat);
+	}
 	
 	
 }
 
+
+//串口3,printf 函数
+//确保一次发送数据不超过USART3_MAX_SEND_LEN字节
+void u3_printf(char* fmt,...)  
+{  
+	u16 i,j; 
+	va_list ap; 
+	va_start(ap,fmt);
+	vsprintf((char*)USART3_TX_BUF,fmt,ap);
+	va_end(ap);
+	i=strlen((const char*)USART3_TX_BUF);		//此次发送数据的长度
+	for(j=0;j<i;j++)							//循环发送数据
+	{
+	  while(USART_GetFlagStatus(USART3,USART_FLAG_TC)==RESET); //循环发送,直到发送完毕   
+		USART_SendData(USART3,USART3_TX_BUF[j]); 
+	} 
+}
 
 
 

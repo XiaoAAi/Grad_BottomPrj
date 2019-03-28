@@ -1,6 +1,8 @@
 #include "bsp_common.h"
 
 char strtemp[128] = {0};
+extern u16 led_falg;				//小灯亮的时间
+void oled_DHT22(u16 Temperature,u16 Humidity);
 
 int main(void)
 {
@@ -11,7 +13,9 @@ int main(void)
 	u8 ndat[512] = {0};
 	u16 ncrc = 0;
 	u16 ncmd = 0;
-	u8 humi,temp;
+	
+	u16 Humidity=0,Temperature=0;
+	u16 old_Humidity=0,old_Temperature=0;
 #if SYS_ENABLE_IAP
     SCB->VTOR = 0x8002000;
     __enable_irq();
@@ -20,6 +24,7 @@ int main(void)
     GPIO_Configure();
     USART_Configure();
     NVIC_Configure();
+	EXTIX_Init();//外部引脚中断初始化
 	TIM3_Int_Init(999, 7199);	//100ms
 	OLED_Init();//oled初始化
 	
@@ -34,25 +39,43 @@ int main(void)
 
 #endif
 //读取DHT22数据
-	while(!DHT22_Read_Data(&humi,&temp))
-{
-	delay_ms(1000);
-	delay_ms(1000);
-	delay_ms(1000);
-}
-	
-	USART_DEBUG("shi du shi:");
-	USART_SendByte(USART1,humi);
-	USART_DEBUG("wen du shi:");
-	USART_SendByte(USART1,temp);
+	DHT22_Read_Data(&Humidity,&Temperature);
+	sprintf(strtemp,"shidu:%d ,wendu:%d \r\n",Humidity,Temperature);
+	USART_DEBUG(strtemp);
+	oled_DHT22( Temperature, Humidity);
+
+//while(1)	
+//{
+//	//检测A7口是否有红外线动作
+//	if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4))
+//{ 
+
 
  wifi_start_trans();
- //OLED_Print_Num(30,1,666);
+ 
  USART_SendBytess(USART1,"wifi tou chuan jie shu");
 	while(1)
 	{
-//		OLED_P6x8Str(0,0,(u8 *)"Temperature is");
-//		OLED_Print_Num(30,1,666);
+		
+		led_falg--;		
+		if(led_falg==0)
+		{
+			//人体传感器部分
+			PAout(7)=0;
+			
+			//DHT22读取温度部分
+			if(DHT22_Read_Data(&Humidity,&Temperature))
+				{
+					if(Humidity!=old_Humidity||Temperature!=old_Temperature)
+					{
+						oled_DHT22( Temperature, Humidity);
+						old_Humidity=Humidity;					//更新
+						old_Temperature=Temperature;
+					}
+				}
+				led_falg=10000;
+		}
+		
 		if(USART_BufferRead(&data) != 0)
 		{
 			ntemp[((++cnt) % 512)] = data;
@@ -84,7 +107,16 @@ int main(void)
 		
 	}
 }
-
+void oled_DHT22(u16 Temperature,u16 Humidity)
+{
+	//OLED显示DHT22温湿度
+	OLED_P8x16Str(0,0,(u8 *)"Temperature is:");	
+	OLED_Print_Num(30,2,Temperature);
+	OLED_P8x16Str(70,4,"`C");
+	OLED_P8x16Str(0,4,"Humidity is:");
+	OLED_Print_Num(30,6,Humidity);
+	OLED_P8x16Str(70,6,"%");
+}
 
 
 
