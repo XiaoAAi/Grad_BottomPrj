@@ -31,6 +31,7 @@ void TIM2_IRQHandler(void)   //TIM3中断
 
 #if  TIM3_CONFIG_ENABLED
 u8 cntDebugLed = 0;
+u16 cntHuman_light=0;
 
 void TIM3_Int_Init(u16 arr, u16 psc)
 {
@@ -61,7 +62,11 @@ void TIM3_IRQHandler(void)   //TIM3中断
 			LED_SWITCH();			
 		}
 		
-		
+		if(cntHuman_light++ > 300)
+		{
+			cntHuman_light = 0;
+			Human_body_Light_OFF;			
+		}
 		
         TIM_ClearITPendingBit(TIM3, TIM_IT_Update);    //清除TIMx的中断待处理位:TIM 中断源
 	}

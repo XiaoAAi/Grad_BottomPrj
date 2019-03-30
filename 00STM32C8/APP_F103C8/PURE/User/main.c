@@ -1,7 +1,7 @@
 #include "bsp_common.h"
 
 char strtemp[128] = {0};
-extern u16 led_falg;				//小灯亮的时间
+volatile u32 led_flag = 0xFFFFF;				//小灯亮的时间
 void oled_DHT22(u16 Temperature,u16 Humidity);
 
 int main(void)
@@ -27,7 +27,7 @@ int main(void)
 	EXTIX_Init();//外部引脚中断初始化
 	TIM3_Int_Init(999, 7199);	//100ms
 	OLED_Init();//oled初始化
-	
+		DHT22_Read_Data(&Humidity,&Temperature);		//读取DHT22数据
 	sprintf(strtemp, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, Version_Day);
 	USART_SendBytes(USART1, (u8*)strtemp, sizeof(strtemp));			//打印版本信息
 #if SYS_ENABLE_IAP
@@ -38,31 +38,18 @@ int main(void)
     }
 
 #endif
-//读取DHT22数据
-	DHT22_Read_Data(&Humidity,&Temperature);
-	sprintf(strtemp,"shidu:%d ,wendu:%d \r\n",Humidity,Temperature);
-	USART_DEBUG(strtemp);
+
 	oled_DHT22( Temperature, Humidity);
 
-//while(1)	
-//{
-//	//检测A7口是否有红外线动作
-//	if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4))
-//{ 
 
-
- wifi_start_trans();
+	wifi_start_trans();		//WIFI 透传打开
  
  USART_SendBytess(USART1,"wifi tou chuan jie shu");
 	while(1)
-	{
-		
-		led_falg--;		
-		if(led_falg==0)
-		{
-			//人体传感器部分
-			PAout(7)=0;
-			
+	{		
+		led_flag--;		
+		if(led_flag==0)
+		{	
 			//DHT22读取温度部分
 			if(DHT22_Read_Data(&Humidity,&Temperature))
 				{
@@ -72,8 +59,11 @@ int main(void)
 						old_Humidity=Humidity;					//更新
 						old_Temperature=Temperature;
 					}
+					if(Humidity>=24)		fen_out=1;	//湿度大打开风扇												
+					else								fen_out=0;	
 				}
-				led_falg=10000;
+				else	oled_DHT22( 0, 0);
+				led_flag=0xFFFFFF;
 		}
 		
 		if(USART_BufferRead(&data) != 0)
@@ -107,6 +97,10 @@ int main(void)
 		
 	}
 }
+
+//函数功能：显示DHT22的温湿度
+//参数：Temperature（温度）、Humidity（湿度）
+//返回值：无
 void oled_DHT22(u16 Temperature,u16 Humidity)
 {
 	//OLED显示DHT22温湿度

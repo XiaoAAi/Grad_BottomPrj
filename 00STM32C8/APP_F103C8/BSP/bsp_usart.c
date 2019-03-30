@@ -1,13 +1,13 @@
 #include "bsp_common.h"
 #include	<stdarg.h>
-bool flagEnableDebug = TRUE;		//DEBUG打印
 
-u8 UsartBuffer[USART_BUFFER_LEN] = {0}; //数据缓冲区
-char ATBuffer[AT_BUFFER_LEN] = {0}; //数据缓冲区
+bool flagEnableDebug = TRUE;									//DEBUG打印
+u8 UsartBuffer[USART_BUFFER_LEN] = {0}; 			//数据缓冲区
+char ATBuffer[AT_BUFFER_LEN] = {0}; 					//数据缓冲区
 u8  USART3_TX_BUF[USART3_MAX_SEND_LEN]; 			//发送缓冲,最大USART3_MAX_SEND_LEN字节
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
-
+u8 cntAt = 0;																	//WiFi缓冲计数
 
 
 //功能：串口1接PC机
@@ -41,7 +41,8 @@ void USART2_IRQHandler(void)
     {
         nTemp = USART_ReceiveData(USART2);
         USART_ClearITPendingBit(USART2, USART_IT_RXNE); //clear flag
-        /**********************************************/
+        /**********************************************/			
+				ATBuffer[(cntAt++ % AT_BUFFER_LEN)] = nTemp;//AT指令测试专用
         USART_BufferWrite(nTemp);
     }
 
@@ -225,7 +226,7 @@ void USART_BufferWrite(u8 ntemp)
     }
 
     UsartBuffer[UsartWptr] = ntemp;
-		//ATBuffer[UsartWptr] = ntemp;//AT指令测试专用
+
 
     if(UsartBuffer[UsartWptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 1) % USART_BUFFER_LEN] == 0xDD
             && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 2) % USART_BUFFER_LEN] == 0xDA && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 3) % USART_BUFFER_LEN] == 0xE1
@@ -259,6 +260,11 @@ void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
 	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
 	{
 		USART_DEBUG("OpenLightCol\r\n");
+		Home_light=1;
+		
+	}else if(cmd == USART_SERVER_BUTTOM_OffLight)
+	{
+		Home_light=0;
 	}
 	else if(cmd==USART_SERVER_BUTTOM_LCDShow)
 	{

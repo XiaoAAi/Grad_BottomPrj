@@ -3,9 +3,9 @@
 #include "stm32f10x_conf.h"
 
 //串口接收队列缓存长度
-#define USART_BUFFER_LEN    4000
-#define AT_BUFFER_LEN    50
-#define	USART3_MAX_SEND_LEN		1000
+#define USART_BUFFER_LEN    		4000
+#define AT_BUFFER_LEN    				100	
+#define	USART3_MAX_SEND_LEN			1000
 
 //红外对射--对射升级HEX版本定义DUISHE_SYS_UPDATE宏，其他版本没有定义
 #ifndef DUISHE_SYS_UPDATE
@@ -52,7 +52,7 @@
 
 //服务端控制指令
 #define  USART_SERVER_BUTTOM_OpenLight					0x0101	//开灯指令
-#define  USART_SERVER_BUTTOM_DownLight					0x0102	//关灯指令
+#define  USART_SERVER_BUTTOM_OffLight					0x0102	//关灯指令
 #define  USART_SERVER_BUTTOM_OpenLock						0x0104	//开锁指令
 #define  USART_SERVER_BUTTOM_OpenFan						0x0105	//开风扇指令
 #define  USART_SERVER_BUTTOM_DownFan						0x0106	//关风扇指令
