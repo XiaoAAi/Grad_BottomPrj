@@ -86,7 +86,7 @@ u8 DHT22_Read_Data(u16 *humi,u16 *temp)
 					*humi=(buf[0]<<8|buf[1])/10;//将高8位和低8位数据合并成16位，再转换成十进制数据
 					
 					*temp=(buf[2]<<8|buf[3])/10;//将高8位和低8位数据合并成16位，再转换成十进制数据
-					USART_DEBUG("999999999999\r\n");
+					USART_DEBUG("DHT22 read OK\r\n");
 					return 1;
 				}
 				else
@@ -99,7 +99,7 @@ u8 DHT22_Read_Data(u16 *humi,u16 *temp)
 		}
 		else
 		{
-			USART_DEBUG("chushi hua shibai 777777777777777\r\n");
+			USART_DEBUG("DHT22 rest is error\r\n");
 			return 0;
 		}
 }

@@ -22,7 +22,7 @@ void GPIO_Configure(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	GPIO_SetBits(GPIOB,GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8);//设置为高电平
-	GPIO_ResetBits(GPIOB,GPIO_Pin_4);	
+	GPIO_ResetBits(GPIOB,GPIO_Pin_4);				//人体传感器控制小灯引脚
 	
 	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8|GPIO_Pin_7;//A8引脚用于OLED。A7用于人体传感器指示灯
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -30,10 +30,13 @@ void GPIO_Configure(void)
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 	GPIO_ResetBits(GPIOA,GPIO_Pin_8);	
 	
-	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_4;//A4引脚用于接人体传感器，
+	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_4|GPIO_Pin_1;//A4引脚用于接人体传感器，A1 接蜂鸣器
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_SetBits(GPIOA,GPIO_Pin_1);	
+	
+	GPIOB->CRL&=0XFFF0FFFF;GPIOB->CRL|=(u32)8<<5;	//光照传感器引脚输入PB5输入
 	
 }
 

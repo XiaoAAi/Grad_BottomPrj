@@ -3,8 +3,7 @@
 
 bool flagEnableDebug = TRUE;									//DEBUG打印
 u8 UsartBuffer[USART_BUFFER_LEN] = {0}; 			//数据缓冲区
-char ATBuffer[AT_BUFFER_LEN] = {0}; 					//数据缓冲区
-u8  USART3_TX_BUF[USART3_MAX_SEND_LEN]; 			//发送缓冲,最大USART3_MAX_SEND_LEN字节
+u8 ATBuffer[AT_BUFFER_LEN] = {0}; 					//数据缓冲区
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
 u8 cntAt = 0;																	//WiFi缓冲计数
@@ -260,7 +259,7 @@ void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
 	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
 	{
 		USART_DEBUG("OpenLightCol\r\n");
-		Home_light=1;
+		Home_light=1;//开灯
 		
 	}else if(cmd == USART_SERVER_BUTTOM_OffLight)
 	{
@@ -275,22 +274,6 @@ void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
 }
 
 
-//串口3,printf 函数
-//确保一次发送数据不超过USART3_MAX_SEND_LEN字节
-void u3_printf(char* fmt,...)  
-{  
-	u16 i,j; 
-	va_list ap; 
-	va_start(ap,fmt);
-	vsprintf((char*)USART3_TX_BUF,fmt,ap);
-	va_end(ap);
-	i=strlen((const char*)USART3_TX_BUF);		//此次发送数据的长度
-	for(j=0;j<i;j++)							//循环发送数据
-	{
-	  while(USART_GetFlagStatus(USART3,USART_FLAG_TC)==RESET); //循环发送,直到发送完毕   
-		USART_SendData(USART3,USART3_TX_BUF[j]); 
-	} 
-}
 
 
 

@@ -1,6 +1,7 @@
 #include "bsp_common.h"
 
-extern char ATBuffer[AT_BUFFER_LEN]; 										//数据缓冲区
+
+extern u8 ATBuffer[AT_BUFFER_LEN]; 										//数据缓冲区
 extern u8 cntAt ;																				//WiFi缓冲计数
 u8 wifi_Reset(void);																		//wifi复位
 u8 esp8266_check_cmd(char *str);												//检查返回的字符是否正确
@@ -31,8 +32,9 @@ u8 wifi_start_trans(void)
 		if(send_AT_cmd("AT+CIPSEND","OK",50))
 		{
 			//测试信息
-			esp8266_send_data("hello xiao na",50);
-			wifi_dis_trans();
+			//esp8266_send_data("hello xiao na",50);
+			//wifi_dis_trans();
+			USART_DEBUG("wifi qi dong tou chuan chen gong\r\n");
 			return 1;
 		}					
 	}
@@ -45,7 +47,7 @@ u8 wifi_start_trans(void)
 //返回值：1（成功）0（失败）
 u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 {
-	u16 c=3;
+	u8 c=3,i=0;
 	//最多重发3次
 	while(c>0)
 	{
@@ -58,8 +60,14 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 		delay_ms(1000);		
 		while(cntAt==0)				//接受缓冲区没数据延时2秒
 		{
-			delay_ms(1000);
-			delay_ms(1000);
+			i++;
+			delay_ms(1000);			
+			if(i>3)
+			{
+				i=0;
+				break;
+			}
+				
 		}
 		USART_DEBUG("\r\n");
 		if(esp8266_check_cmd(AT_ack))
@@ -81,7 +89,7 @@ u8 esp8266_check_cmd(char *str)
 	char *strx=0;
 	strx=strstr((const char*)ATBuffer,(const char*)str);
 	USART_DEBUG("------------huan chong qu---------\r\n");
-	USART_DEBUG(ATBuffer);
+	USART_DEBUG((char *)ATBuffer);
 	USART_DEBUG("\r\n");
 	memset(ATBuffer, 0, sizeof(ATBuffer)); 			//清空AT接受缓冲区
 	cntAt=0;																		//复位缓冲区计数
@@ -118,19 +126,44 @@ u8 wifi_dis_trans(void)
 //函数功能：ESP8266向服务器发送数据
 //参数：cmd:发送的数据字符串;waittime:等待时间(单位:ms)
 //返回值:发送数据后，服务器的返回验证码
-u8* esp8266_send_data(char *cmd,u16 waittime)
+u8 esp8266_send_cmd(u16 *cmd,u16 waittime)
 {
-	char temp[5];
-	char *ack=temp;
-	USART_SendBytess(USART2,cmd);//发送AT指令
-	delay_ms(waittime);
-	if(USART_BufferRead((u8*)ack) == 0)
-		{
-			ack=(char*)ATBuffer;
-			USART_DEBUG(ack);
-			cntAt=0;						//复位缓冲区计数
-		}
-	return (u8*)ack;
+//	//u8 temp[5];
+//	char *ack;
+//	USART_SendBytess(USART2,cmd);//发送AT指令
+//	USART_DEBUG("fa song de shu ju shi:\r\n");
+//	USART_DEBUG(cmd);
+//	USART_DEBUG("\r\n");
+//	delay_ms(waittime);
+//	while(cntAt==0)
+//		{
+//		delay_ms(1000);
+//		}		
+//		ack=(char *)ATBuffer;
+//		USART_DEBUG((char *)ATBuffer);
+//		memset(ATBuffer, 0, sizeof(ATBuffer)); 
+//		cntAt=0;															//复位缓冲区计数		
+//	return (u8*)ack;
+	u8 str[8] = {0};
+    u8 cnt = 0;
+    u16 ncrc = 0;
+    str[0] = HBYTE(*cmd);
+    str[1] = LBYTE(*cmd);
+    str[2] = 0;
+    str[3] = 2;
+    ncrc = ModBusCRC(&str[0], 4);
+    str[4] = HBYTE(ncrc);
+    str[5] = LBYTE(ncrc);
+    str[6] = 0xDD;
+    str[7] = 0xEE;
+
+    for(cnt = 0; cnt < 8; cnt++)
+    {
+        USART_SendByte(USART2, str[cnt]);
+    }
+		delay_us(waittime);
+		
+		return 1;
 } 
 
 
@@ -152,3 +185,6 @@ u8 wifi_Reset(void)
 	else 
 		return 0;
 }
+
+
+
