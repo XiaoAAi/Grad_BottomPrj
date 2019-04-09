@@ -30,8 +30,11 @@ void TIM2_IRQHandler(void)   //TIM3中断
 #endif
 
 #if  TIM3_CONFIG_ENABLED
-u8 cntDebugLed = 0;
+u8 cntDebugLed = 0,cnt=0;
 u16 cntHuman_light=0;
+u16 cnt_date_time=0;
+u8 cnt_time=0;
+static u16 Humidity=0,Tempreture=0;
 
 void TIM3_Int_Init(u16 arr, u16 psc)
 {
@@ -55,6 +58,24 @@ void TIM3_IRQHandler(void)   //TIM3中断
 {
     if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)  //检查指定的TIM中断发生与否:TIM 中断源
     {
+		if(cnt_time++>10)	//1秒
+		{
+			Oled_ShowTime();
+			cnt_time=0;	
+			cnt%=30;			
+			if(cnt==0)
+			{
+				u8 dht22data[5]={0};
+				DHT22_Read_Data(&Humidity,&Tempreture);
+				oled_DHT22(Humidity,Tempreture);		//温湿度要除以10才是正确值
+				dht22data[0]=HBYTE(Humidity);
+				dht22data[1]=LBYTE(Humidity);
+				dht22data[2]=HBYTE(Tempreture);
+				dht22data[3]=LBYTE(Tempreture);
+				SendCmdDat(USART2,USART_BUTTOM_SERVER_SendHeartbeat,(char*)dht22data,4);	//心跳包
+			}
+			cnt++;
+		}
 		//调试灯
 		if(cntDebugLed++ > 5)
 		{
@@ -62,10 +83,15 @@ void TIM3_IRQHandler(void)   //TIM3中断
 			LED_SWITCH();			
 		}
 		
-		if(cntHuman_light++ > 300)
+		if(cntHuman_light++ > 30)//3秒
 		{
 			cntHuman_light = 0;
 			Human_body_Light_OFF;			
+		}
+		if(cnt_date_time++ >600)//1分钟
+		{			
+			SendCmd(USART2,USART_BUTTOM_SERVER_Date);//获取时间
+			cnt_date_time=0;
 		}
 		
         TIM_ClearITPendingBit(TIM3, TIM_IT_Update);    //清除TIMx的中断待处理位:TIM 中断源

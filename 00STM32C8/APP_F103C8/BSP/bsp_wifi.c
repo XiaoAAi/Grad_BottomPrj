@@ -23,7 +23,7 @@ u8 wifi_start_trans(void)
 	send_AT_cmd("AT+CIPMUX=0","OK",50);
 	
 	//建立TCP连接  这四项分别代表了 要连接的ID号0~4   连接类型  远程服务器IP地址   远程服务器端口号
-	if(send_AT_cmd("AT+CIPSTART=\"TCP\",\"192.168.3.202\",8580","CONNECT",200))
+	if(send_AT_cmd("AT+CIPSTART=\"TCP\",\"120.78.79.152\",8888","CONNECT",200))
 	{
 		//是否开启透传模式  0：表示关闭 1：表示开启透传
 		send_AT_cmd("AT+CIPMODE=1","OK",200);
@@ -31,8 +31,7 @@ u8 wifi_start_trans(void)
 		//透传模式下 开始发送数据的指令 这个指令之后就可以直接发数据了
 		if(send_AT_cmd("AT+CIPSEND","OK",50))
 		{
-			//测试信息
-			//esp8266_send_data("hello xiao na",50);
+			SendCmd(USART2,USART_BUTTOM_SERVER_Date);//获取时间
 			//wifi_dis_trans();
 			USART_DEBUG("wifi qi dong tou chuan chen gong\r\n");
 			return 1;

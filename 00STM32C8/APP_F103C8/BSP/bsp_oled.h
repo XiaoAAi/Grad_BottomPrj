@@ -31,8 +31,9 @@ void OLED_Print_Num(u8 x, u8 y, u16 num);
 void OLED_P8x16Str(u8 x,u8 y,u8 ch[]);
 void OLED_P6x8Str(u8 x,u8 y,u8 ch[]);
 
-void RCC_congig(void);//呼吸灯配置
-
+void RCC_congig(void);					//呼吸灯配置
+void Oled_ShowTime(void);								//时间显示在OLED 屏幕上
+void Get_date(u8 date[]);				//存储网络时间
 
 
 

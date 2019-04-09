@@ -17,6 +17,11 @@
 			
 
 u8 DHT22_Read_Data(u16 *humi,u16 *temp);	//DHT22读取温度
+//函数功能：显示DHT22的温湿度
+//参数：Temperature（温度）、Humidity（湿度）
+//返回值：无
+void oled_DHT22(u16 Humidity,u16 Temperature);
+
 
 #endif
 

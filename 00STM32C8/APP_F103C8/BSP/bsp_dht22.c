@@ -1,5 +1,7 @@
 #include "bsp_common.h"
 char test[20]={0};
+//u16 Humidity=0,Temperature=0;
+//u16 old_Humidity=0,old_Temperature=0;
 //DHT22初始化
 u8 DHT22_Rst(void)
 {
@@ -83,14 +85,16 @@ u8 DHT22_Read_Data(u16 *humi,u16 *temp)
 			check=buf[0]+buf[1]+buf[2]+buf[3];
 			if(check==buf[4])
 				{
-					*humi=(buf[0]<<8|buf[1])/10;//将高8位和低8位数据合并成16位，再转换成十进制数据
+					*humi=(buf[0]<<8|buf[1]);//将高8位和低8位数据合并成16位，再转换成十进制数据
 					
-					*temp=(buf[2]<<8|buf[3])/10;//将高8位和低8位数据合并成16位，再转换成十进制数据
+					*temp=(buf[2]<<8|buf[3]);//将高8位和低8位数据合并成16位，再转换成十进制数据
 					USART_DEBUG("DHT22 read OK\r\n");
 					return 1;
 				}
 				else
 				{
+					*humi=0;
+					*temp=0;
 					USART_DEBUG("wen du du qu cuo wu------>\r\n");
 					sprintf(test,"shidu:%d,%d,wendu:%d,%d,jiaoyan:%d。check:%d\r\n",buf[0],buf[1],buf[2],buf[3],buf[4],check);
 					USART_DEBUG(test);
@@ -99,10 +103,50 @@ u8 DHT22_Read_Data(u16 *humi,u16 *temp)
 		}
 		else
 		{
+			*humi=0;
+			*temp=0;
 			USART_DEBUG("DHT22 rest is error\r\n");
 			return 0;
 		}
 }
 
-
+//函数功能：显示DHT22的温湿度
+//参数：Temperature（温度）、Humidity（湿度）
+//返回值：无
+void oled_DHT22(u16 Humidity,u16 Temperature)
+{
+//	if(DHT22_Read_Data(&Humidity,&Temperature))
+//	{
+//		if(Humidity!=old_Humidity||Temperature!=old_Temperature)
+//		{					
+//			old_Humidity=Humidity;					//更新
+//			old_Temperature=Temperature;
+//			//SendCmdDat(USART2,);
+//		}
+	u8 Temperature_L=Temperature%10;
+	u8 Humidity_L=Humidity%10;
+	Temperature/=10;
+	Humidity/=10;
+		if(Temperature>=25)		
+		{
+			fen_out=1;	//湿度大打开风扇
+			if(Temperature>30)
+					Buzzer_potr=0;		//蜂鸣器打开		
+		}								
+		else
+		{
+			fen_out=0;				//关闭风扇
+			Buzzer_potr=1;		//蜂鸣器关闭						
+		}											
+//	}
+	//OLED显示DHT22温湿度
+	OLED_P8x16Str(0,6,(u8 *)"T:");	
+	OLED_Print_Num(20,6,Temperature);
+	OLED_Print_Num(40,6,Temperature_L);
+	OLED_P8x16Str(50,6,"`C");
+	OLED_P8x16Str(80,6,"H:");
+	OLED_Print_Num(100,6,Humidity);
+	OLED_Print_Num(120,6,Humidity_L);
+	OLED_P8x16Str(140,6,"%");
+}
 

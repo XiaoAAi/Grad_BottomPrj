@@ -4,6 +4,7 @@
 bool flagEnableDebug = TRUE;									//DEBUG打印
 u8 UsartBuffer[USART_BUFFER_LEN] = {0}; 			//数据缓冲区
 u8 ATBuffer[AT_BUFFER_LEN] = {0}; 					//数据缓冲区
+u8  USART3_TX_BUF[USART3_MAX_SEND_LEN]; 			//发送缓冲,最大USART3_MAX_SEND_LEN字节(这句不可以删不知道）
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
 u8 cntAt = 0;																	//WiFi缓冲计数
@@ -243,11 +244,11 @@ void USART_BufferWrite(u8 ntemp)
 }
 
 //功能：主要用于指令的处理
-void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
+void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 {
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
 	USART_DEBUG(strtemp);
-	
+
 	if(cmd == USART_SERVER_BUTTOM_WillUpdate) //准备升级对射
 	{
 		SendCmd(USART2, USART_SERVER_BUTTOM_WillUpdateFeedBack);
@@ -259,15 +260,43 @@ void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
 	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
 	{
 		USART_DEBUG("OpenLightCol\r\n");
+		SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
 		Home_light=1;//开灯
 		
 	}else if(cmd == USART_SERVER_BUTTOM_OffLight)
 	{
+		USART_DEBUG("closeLightCol\r\n");//关灯
+		SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
 		Home_light=0;
 	}
-	else if(cmd==USART_SERVER_BUTTOM_LCDShow)
+	else if(cmd==USART_SERVER_BUTTOM_LCDShow)	//LED显示
 	{
-		OLED_P6x8Str(0,0,(u8 *)dat);
+		dat[datLen+1]='\0';
+		OLED_P8x16Str(0,0,dat);
+		USART_DEBUG("OLEDshow\r\n");
+		SendCmd(USART2, USART_BUTTOM_SERVER_Oledshowback);	//oled反馈
+	}
+	else if(cmd==USART_SERVER_BUTTOM_OpenFan)
+	{
+		fen_out=1;		//打开风扇
+	}
+	else if(cmd==USART_SERVER_BUTTOM_DownFan)
+	{
+		fen_out=0;		//打开风扇
+		SendCmd(USART2,USART_BUTTOM_SERVER_FanFeedback);//反馈
+	}
+	else if(cmd==USART_SERVER_BUTTOM_OpenLock)	//开锁指令
+	{
+		//fen_out=0;		//打开门锁
+		//if()返回门锁的状态
+		USART_DEBUG("Open ther door\r\n");
+		DoorLockOpen;
+		SendCmdDat(USART2,USART_BUTTOM_SERVER_LockFeedback,"AA",2);
+	}
+	else if(cmd==USART_SERVER_BUTTOM_Getdate)
+	{
+		Get_date((u8 *)dat);				//存储网络时间
+		USART_DEBUG("Get date is OK \r\n");
 	}
 	
 	

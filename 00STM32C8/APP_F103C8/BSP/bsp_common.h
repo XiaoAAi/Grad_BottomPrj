@@ -47,7 +47,7 @@ extern char strtemp[128];
 //函数定义
 unsigned short ModBusCRC(unsigned char *pData, unsigned int siLen);
 
-
+void HexToStr(u8 *pbDest, u8 *pbSrc, int nLen);		//16进制转字符串
 
 
 
