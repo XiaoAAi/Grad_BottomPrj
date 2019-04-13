@@ -32,8 +32,6 @@ u8 wifi_start_trans(void)
 		if(send_AT_cmd("AT+CIPSEND","OK",50))
 		{
 			SendCmd(USART2,USART_BUTTOM_SERVER_Date);//获取时间
-			//wifi_dis_trans();
-			USART_DEBUG("wifi qi dong tou chuan chen gong\r\n");
 			return 1;
 		}					
 	}
@@ -87,12 +85,8 @@ u8 esp8266_check_cmd(char *str)
 {	
 	char *strx=0;
 	strx=strstr((const char*)ATBuffer,(const char*)str);
-	USART_DEBUG("------------huan chong qu---------\r\n");
-	USART_DEBUG((char *)ATBuffer);
-	USART_DEBUG("\r\n");
 	memset(ATBuffer, 0, sizeof(ATBuffer)); 			//清空AT接受缓冲区
 	cntAt=0;																		//复位缓冲区计数
-	USART_DEBUG("-------------------------------\r\n");
 	if(strx!=NULL)
 		return 	1;
 	else

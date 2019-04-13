@@ -1,6 +1,6 @@
 #include "bsp_timer.h"
 
-
+extern u8 Lock_flag;
 
 #if TIM2_CONFIG_ENABLED
 void TIM2_Int_Init(u16 arr, u16 psc)
@@ -34,6 +34,7 @@ u8 cntDebugLed = 0,cnt=0;
 u16 cntHuman_light=0;
 u16 cnt_date_time=0;
 u8 cnt_time=0;
+u8 cnt_Lock=0;//为门锁计时
 static u16 Humidity=0,Tempreture=0;
 
 void TIM3_Int_Init(u16 arr, u16 psc)
@@ -75,6 +76,19 @@ void TIM3_IRQHandler(void)   //TIM3中断
 				SendCmdDat(USART2,USART_BUTTOM_SERVER_SendHeartbeat,(char*)dht22data,4);	//心跳包
 			}
 			cnt++;
+			if(Lock_flag)
+			{
+				cnt_Lock++;
+				if(cnt_Lock>5)
+				{
+					char send_cmd=0xbb;
+					cnt_Lock=0;
+					Lock_flag=0;
+					DoorLockClose;
+					SendCmdDat(USART2,USART_BUTTOM_SERVER_LockFeedback,&send_cmd,1);
+				}
+			}
+				
 		}
 		//调试灯
 		if(cntDebugLed++ > 5)
@@ -82,7 +96,7 @@ void TIM3_IRQHandler(void)   //TIM3中断
 			cntDebugLed = 0;
 			LED_SWITCH();			
 		}
-		
+		//人体检测灯
 		if(cntHuman_light++ > 30)//3秒
 		{
 			cntHuman_light = 0;

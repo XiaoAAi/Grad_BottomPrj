@@ -8,6 +8,7 @@ u8  USART3_TX_BUF[USART3_MAX_SEND_LEN]; 			//发送缓冲,最大USART3_MAX_SEND_
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
 u8 cntAt = 0;																	//WiFi缓冲计数
+u8 Lock_flag=0;
 
 
 //功能：串口1接PC机
@@ -246,6 +247,7 @@ void USART_BufferWrite(u8 ntemp)
 //功能：主要用于指令的处理
 void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 {
+	char send_cmd[2]={0xaa};
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
 	USART_DEBUG(strtemp);
 
@@ -260,13 +262,17 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
 	{
 		USART_DEBUG("OpenLightCol\r\n");
-		SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
+		//SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
+		SendCmdDat(USART2,USART_BUTTOM_SERVER_LightFeedback,send_cmd,1);
 		Home_light=1;//开灯
+
 		
 	}else if(cmd == USART_SERVER_BUTTOM_OffLight)
 	{
 		USART_DEBUG("closeLightCol\r\n");//关灯
-		SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
+		//SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
+		send_cmd[0]=0xbb;
+		SendCmdDat(USART2,USART_BUTTOM_SERVER_LightFeedback,send_cmd,1);
 		Home_light=0;
 	}
 	else if(cmd==USART_SERVER_BUTTOM_LCDShow)	//LED显示
@@ -279,19 +285,24 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	else if(cmd==USART_SERVER_BUTTOM_OpenFan)
 	{
 		fen_out=1;		//打开风扇
+		send_cmd[0]=0xaa;
+		SendCmdDat(USART2,USART_BUTTOM_SERVER_FanFeedback,send_cmd,1);
 	}
 	else if(cmd==USART_SERVER_BUTTOM_DownFan)
 	{
-		fen_out=0;		//打开风扇
-		SendCmd(USART2,USART_BUTTOM_SERVER_FanFeedback);//反馈
+		send_cmd[0]=0xbb;
+		fen_out=0;		//关闭风扇
+		//SendCmd(USART2,USART_BUTTOM_SERVER_FanFeedback);//反馈
+		SendCmdDat(USART2,USART_BUTTOM_SERVER_FanFeedback,send_cmd,1);
 	}
 	else if(cmd==USART_SERVER_BUTTOM_OpenLock)	//开锁指令
 	{
-		//fen_out=0;		//打开门锁
 		//if()返回门锁的状态
 		USART_DEBUG("Open ther door\r\n");
 		DoorLockOpen;
-		SendCmdDat(USART2,USART_BUTTOM_SERVER_LockFeedback,"AA",2);
+		Lock_flag=1;
+		send_cmd[0]=0xaa;
+		SendCmdDat(USART2,USART_BUTTOM_SERVER_LockFeedback,send_cmd,1);
 	}
 	else if(cmd==USART_SERVER_BUTTOM_Getdate)
 	{

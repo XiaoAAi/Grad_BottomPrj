@@ -15,20 +15,20 @@ void GPIO_Configure(void)
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 	GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 	//B端口输出引脚
-	//DHT22温湿度传感器引脚B8  	风扇引脚时A3  房间灯B4 门锁B9(低电平触发)
+	//DHT22温湿度传感器引脚B8  	风扇引脚时B3  房间灯B4 门锁B9(低电平触发)
 	//OLED引脚配置GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15
-	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8|GPIO_Pin_3|GPIO_Pin_4;
+	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8|GPIO_Pin_9|GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	GPIO_SetBits(GPIOB,GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8|GPIO_Pin_4);//设置为高电平
+	GPIO_SetBits(GPIOB,GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8);//设置为高电平
 	//GPIO_ResetBits(GPIOB, GPIO_Pin_9);
 	//A端口输出
-	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8|GPIO_Pin_7|GPIO_Pin_1;//A8引脚用于OLED。A7用于人体传感器指示灯 A1 接蜂鸣器
+	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8|GPIO_Pin_7|GPIO_Pin_1|GPIO_Pin_0;//A8引脚用于OLED。A7用于人体传感器指示灯 A1 接蜂鸣器
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	GPIO_ResetBits(GPIOA,GPIO_Pin_8);	
+	GPIO_ResetBits(GPIOA,GPIO_Pin_8|GPIO_Pin_0);	
 	GPIO_SetBits(GPIOA,GPIO_Pin_1);	//蜂鸣器（低电平触发）
 	//A端口输入
 	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_4;//A4引脚用于接人体传感器

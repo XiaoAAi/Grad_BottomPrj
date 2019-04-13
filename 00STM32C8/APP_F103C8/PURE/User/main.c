@@ -11,7 +11,7 @@ int main(void)
 	u8 ndat[512] = {0};
 	u16 ncrc = 0;
 	u16 ncmd = 0;
-	u8 testre;	
+	
 #if SYS_ENABLE_IAP
     SCB->VTOR = 0x8002000;
     __enable_irq();
@@ -36,32 +36,17 @@ int main(void)
 #endif
 
 
-	//wifi_dis_trans();
-//	u8 date_cmd[4] = {0x01, 0x01, 0x00, 0x02};
-//	ncrc = ModBusCRC(&date_cmd[0], 4);
-//	sprintf(strtemp, "ncrc:%X\r\n", ncrc);
-//	USART_DEBUG(strtemp);
+	wifi_dis_trans();
 	if(wifi_start_trans())		//WIFI 透传打开	
 	{
-		u16 ss=0x0101;
-		testre=esp8266_send_cmd(&ss,1000);
-		USART_DEBUG((char*)testre);
+//		u16 ss=0x0101;
+//		testre=esp8266_send_cmd(&ss,1000);
+		USART_DEBUG("wifi success\r\n");
 		//wifi_dis_trans();
 	}
 	
 	while(1)
 	{	
-//		delay_us(1000);
-//		delay_us(1000);
-//		delay_us(1000);
-//		delay_us(1000);
-//		delay_us(1000);
-//		delay_us(1000);
-//		if(light_sensor_port)
-//			USART_DEBUG("1");
-//		else
-//			USART_DEBUG("0");
-//		
 
 		if(USART_BufferRead(&data) != 0)
 		{

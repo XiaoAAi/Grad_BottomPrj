@@ -59,8 +59,6 @@
 #define  USART_SERVER_BUTTOM_OpenFan						0x0105	//开风扇指令
 #define  USART_SERVER_BUTTOM_DownFan						0x0106	//关风扇指令
 #define  USART_SERVER_BUTTOM_LCDShow						0x0107	//oled显示接收数据指令
-#define  USART_SERVER_BUTTOM_QueryHumidity			0x0108	//查询湿度指令
-#define  USART_SERVER_BUTTOM_QueryTemperature		0x0109	//查询温度指令
 #define  USART_SERVER_BUTTOM_Getdate						0x0100	//获取到时间 
 
 //IAP系统升级
