@@ -5,6 +5,7 @@ pFunction Jump_To_Application;
 u32 JumpAddress; //跳转地址
 
 u8 UsartBuffer[USART_BUFFER_LEN] = {0}; //数据缓冲区
+u8 ATBuffer[AT_BUFFER_LEN] = {0}; 					//AT数据缓冲区
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
 
@@ -13,6 +14,8 @@ u8 write_flash_data_bit = 0;
 u8 datalow = 0;
 u8 datahigh = 0;
 u32 flashwptr = 0;
+
+u8 cntAt = 0;
 
 u8 flag_dis_jump = 1; // 禁止处理升级结束指令
 
@@ -78,6 +81,7 @@ void USART2_IRQHandler(void)
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
     {
         nTemp = USART_ReceiveData(USART2);
+		ATBuffer[(cntAt++ % AT_BUFFER_LEN)] = nTemp;//AT指令测试专用
         USART_ClearITPendingBit(USART2, USART_IT_RXNE); //clear flag
         /************************************************/
         USART_BufferWrite(nTemp);
