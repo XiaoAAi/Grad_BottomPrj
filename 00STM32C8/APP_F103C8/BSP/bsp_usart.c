@@ -213,8 +213,6 @@ u8 USART_BufferRead(u8 *data)
     }
 	*data = UsartBuffer[UsartRptr];
 	UsartRptr = (UsartRptr + 1) % USART_BUFFER_LEN;
-//	sprintf(strtemp, "Data:%X\r\n", *data);
-//	USART_DEBUG(strtemp);
 	return 1;
 }
 
@@ -247,7 +245,6 @@ void USART_BufferWrite(u8 ntemp)
 //功能：主要用于指令的处理
 void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 {
-	char send_cmd[2]={0xaa};
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
 	USART_DEBUG(strtemp);
 
@@ -261,17 +258,16 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	}
 	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
 	{
+		char send_cmd[2]={0xAA};
 		USART_DEBUG("OpenLightCol\r\n");
-		//SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
 		SendCmdDat(USART2,USART_BUTTOM_SERVER_LightFeedback,send_cmd,1);
 		Home_light=1;//开灯
 
 		
 	}else if(cmd == USART_SERVER_BUTTOM_OffLight)
 	{
+		char send_cmd[2]={0xBB};
 		USART_DEBUG("closeLightCol\r\n");//关灯
-		//SendCmd(USART2, USART_BUTTOM_SERVER_LightFeedback);	//小灯反馈
-		send_cmd[0]=0xbb;
 		SendCmdDat(USART2,USART_BUTTOM_SERVER_LightFeedback,send_cmd,1);
 		Home_light=0;
 	}
@@ -284,13 +280,13 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	}
 	else if(cmd==USART_SERVER_BUTTOM_OpenFan)
 	{
-		fen_out=1;		//打开风扇
-		send_cmd[0]=0xaa;
+		char send_cmd[2] = {0xAA};
+		fen_out=1;		//打开风扇		
 		SendCmdDat(USART2,USART_BUTTOM_SERVER_FanFeedback,send_cmd,1);
 	}
 	else if(cmd==USART_SERVER_BUTTOM_DownFan)
 	{
-		send_cmd[0]=0xbb;
+		char send_cmd[2]={0xBB};
 		fen_out=0;		//关闭风扇
 		//SendCmd(USART2,USART_BUTTOM_SERVER_FanFeedback);//反馈
 		SendCmdDat(USART2,USART_BUTTOM_SERVER_FanFeedback,send_cmd,1);
@@ -298,10 +294,10 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	else if(cmd==USART_SERVER_BUTTOM_OpenLock)	//开锁指令
 	{
 		//if()返回门锁的状态
+		char send_cmd[2]={0xAA};
 		USART_DEBUG("Open ther door\r\n");
 		DoorLockOpen;
 		Lock_flag=1;
-		send_cmd[0]=0xaa;
 		SendCmdDat(USART2,USART_BUTTOM_SERVER_LockFeedback,send_cmd,1);
 	}
 	else if(cmd==USART_SERVER_BUTTOM_Getdate)

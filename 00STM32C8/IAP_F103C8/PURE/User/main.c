@@ -26,14 +26,7 @@ int main(void)
     USART_SendBytes(USART1, ndat, strlen((char*)ndat));
     start_flash_flag = None_Flash_Bod;
     //IAP_Reset_UpdateFLAG();
-	
-	wifi_dis_trans();
-	if(wifi_start_trans())		//WIFI 透传打开	
-	{
-		USART_SendBytess(USART1, "wifi success\r\n");
-	}
-	
-	
+
     if(IAP_Read_UpdateFLAG() == 1)
     {
         __disable_irq();

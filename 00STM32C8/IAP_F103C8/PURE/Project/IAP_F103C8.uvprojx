@@ -581,16 +581,6 @@
               <FileType>5</FileType>
               <FilePath>..\..\BSP\bsp_usart.h</FilePath>
             </File>
-            <File>
-              <FileName>bsp_wifi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_wifi.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_wifi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\BSP\bsp_wifi.h</FilePath>
-            </File>
           </Files>
         </Group>
       </Groups>

@@ -16,12 +16,11 @@
 #include "bsp_usart.h"
 #include "bsp_gpio.h"
 #include "bsp_delay.h"
-#include "bsp_wifi.h"
 
 #define   Prefix             "IAP_BUTTOM"    //前缀，区分不同机型
 #define   Version_Year       "19"      // year
-#define   Version_Month      "04"      // month
-#define   Version_Day        "17"      // day
+#define   Version_Month      "02"      // month
+#define   Version_Day        "26"      // day
 
 #define HBYTE(a)               ((unsigned char)(((unsigned short)(a) >> 8) & 0xFF))
 #define LBYTE(a)               ((unsigned char)((unsigned short)(a)& 0xff))

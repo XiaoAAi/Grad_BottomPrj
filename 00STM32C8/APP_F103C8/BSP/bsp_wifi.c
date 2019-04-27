@@ -54,7 +54,8 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 		USART_SendBytess(USART2,"\r\n");
 		USART_DEBUG(AT_cmd);
 		delay_ms(waittime);
-		delay_ms(1000);		
+		delay_ms(1000);	
+		
 		while(cntAt==0)				//接受缓冲区没数据延时2秒
 		{
 			i++;
@@ -66,14 +67,13 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 			}
 				
 		}
-		USART_DEBUG("\r\n");
 		if(esp8266_check_cmd(AT_ack))
 			{
-					USART_SendBytess(USART1, "AT command ACK is Successfly\r\n");			//AT指令发送和确认成功
+					USART_DEBUG("AT command ACK is Successfly\r\n");			//AT指令发送和确认成功
 					return 1;
 			}			
 		}	
-	USART_SendBytess(USART1,"3thd AT ACK error\r\n");			//3次AT指令发送失败
+	USART_DEBUG("3thd AT ACK error\r\n");			//3次AT指令发送失败
 	return 0;
 }
 
@@ -83,14 +83,27 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 //返回值:0,没有得到期待的应答结果;其他,期待应答结果的位置(str的位置)
 u8 esp8266_check_cmd(char *str)
 {	
-	char *strx=0;
-	strx=strstr((const char*)ATBuffer,(const char*)str);
-	memset(ATBuffer, 0, sizeof(ATBuffer)); 			//清空AT接受缓冲区
-	cntAt=0;																		//复位缓冲区计数
-	if(strx!=NULL)
-		return 	1;
-	else
-		return	0;	
+//	char *strx=0;
+//	strx=strstr((const char*)ATBuffer,(const char*)str);
+//	memset(ATBuffer, 0, sizeof(ATBuffer)); 			//清空AT接受缓冲区
+//	cntAt=0;																		//复位缓冲区计数
+//	if(strx!=NULL)
+//		return 	1;
+//	else
+//		return	0;
+	u8 i = 0;
+	u8 rval = 0;
+	char* temp_p = (char *)ATBuffer;
+	for (i = 0; i < AT_BUFFER_LEN - strlen(str); i++) {
+		rval = strncmp( temp_p + i, (const char*)str, strlen(str));
+		//rval如果为0表示相等，反之，不等
+		if (!rval)
+		{
+			return 1;
+		}
+	}
+	return 0;
+	
 }
 
 
@@ -100,8 +113,8 @@ u8 esp8266_check_cmd(char *str)
 //参数：无
 u8 wifi_dis_trans(void)
 {
-	USART_SendBytess(USART2,"+++");//发送AT指令
-	delay_ms(30);
+	//USART_SendBytess(USART2,"+++");//发送AT指令
+	delay_ms(1000);
 	if(send_AT_cmd("AT","OK",50))
 	{		
 		USART_DEBUG("wifi trans disconnect\r\n");

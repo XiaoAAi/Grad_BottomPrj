@@ -5,7 +5,6 @@
 /***************************************************/
 //串口接收队列缓存长度
 #define USART_BUFFER_LEN 4000
-#define AT_BUFFER_LEN    				100	
 /***************************************************/
 //定义配置使能
 #define USART1_CONFIG_ENABLED                (1)
@@ -15,7 +14,7 @@
 
 //定义串口波特率
 #define USART1_BAUDRATE                       9600
-#define USART2_BAUDRATE                       9600
+#define USART2_BAUDRATE                       115200
 #define USART3_BAUDRATE                       9600
 
 
