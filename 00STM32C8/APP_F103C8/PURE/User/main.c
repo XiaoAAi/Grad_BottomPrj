@@ -27,6 +27,7 @@ int main(void)
 	Oled_ShowTime();//显示日期时间
 	sprintf(strtemp, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, Version_Day);
 	USART_SendBytes(USART1, (u8*)strtemp, sizeof(strtemp));			//打印版本信息
+	__enable_irq();
 	
 	wifi_dis_trans();
 	//USART_DEBUG("disEnd\r\n");
@@ -34,8 +35,8 @@ int main(void)
 	{
 		USART_DEBUG("wifi success\r\n");
 	}
-
-	__enable_irq();
+	TIM_Cmd(TIM3, ENABLE);
+	
 	
 #if SYS_ENABLE_IAP
 

@@ -17,8 +17,7 @@ u8 wifi_start_trans(void)
 	send_AT_cmd("AT+CWMODE=1\r\n","OK",50);
 	
 	//让模块连接上自己的路由
-	//send_AT_cmd("AT+CWJAP=\"ZNHL\",\"ZnHl@4501.\"","WIFI CONNECTED",1000);
-	send_AT_cmd("AT+CWJAP=\"xiaomi5\",\"123456789\"","WIFI CONNECTED",1000);
+	send_AT_cmd("AT+CWJAP=\"ZNHL\",\"ZnHl@4501.\"","WIFI CONNECTED",1000);
 	
 	//=0：单路连接模式     =1：多路连接模式
 	send_AT_cmd("AT+CIPMUX=0","OK",50);
@@ -55,7 +54,8 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 		USART_SendBytess(USART2,"\r\n");
 		USART_DEBUG(AT_cmd);
 		delay_ms(waittime);
-		delay_ms(1000);		
+		delay_ms(1000);	
+		
 		while(cntAt==0)				//接受缓冲区没数据延时2秒
 		{
 			i++;
@@ -67,14 +67,13 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 			}
 				
 		}
-		USART_DEBUG("\r\n");
 		if(esp8266_check_cmd(AT_ack))
 			{
-					USART_SendBytess(USART1, "AT command ACK is Successfly\r\n");			//AT指令发送和确认成功
+					USART_DEBUG("AT command ACK is Successfly\r\n");			//AT指令发送和确认成功
 					return 1;
 			}			
 		}	
-	USART_SendBytess(USART1,"3thd AT ACK error\r\n");			//3次AT指令发送失败
+	USART_DEBUG("3thd AT ACK error\r\n");			//3次AT指令发送失败
 	return 0;
 }
 
@@ -92,7 +91,6 @@ u8 esp8266_check_cmd(char *str)
 //		return 	1;
 //	else
 //		return	0;
-
 	u8 i = 0;
 	u8 rval = 0;
 	char* temp_p = (char *)ATBuffer;
@@ -104,7 +102,8 @@ u8 esp8266_check_cmd(char *str)
 			return 1;
 		}
 	}
-	return 0;	
+	return 0;
+	
 }
 
 
@@ -114,8 +113,8 @@ u8 esp8266_check_cmd(char *str)
 //参数：无
 u8 wifi_dis_trans(void)
 {
-	USART_SendBytess(USART2,"+++");//发送AT指令
-	delay_ms(30);
+	//USART_SendBytess(USART2,"+++");//发送AT指令
+	delay_ms(1000);
 	if(send_AT_cmd("AT","OK",50))
 	{		
 		USART_DEBUG("wifi trans disconnect\r\n");

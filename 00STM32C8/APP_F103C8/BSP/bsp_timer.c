@@ -49,7 +49,7 @@ void TIM3_Int_Init(u16 arr, u16 psc)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //根据TIM_TimeBaseInitStruct中指定的参数初始化TIMx的时间基数单位
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //使能指定的TIM3中断,允许更新中断
 	
-	TIM_Cmd(TIM3, ENABLE);  
+		TIM_Cmd(TIM3, DISABLE);  
 
 }
 
