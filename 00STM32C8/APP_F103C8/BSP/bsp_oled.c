@@ -1,6 +1,5 @@
 #include "bsp_common.h"
 
-
 void RCC_congig(void)
 {
 //	SystemInit（）;
@@ -87,6 +86,7 @@ void TIM2_PWM_init(u16 arr,u16 psc)
 //获取网络时间
 void Get_date(u8 date[])
 {
+	char strtemp[50]={0};
 	memcpy(Year,&date[0],4);
 	memcpy(Month,&date[4],2);
 	memcpy(Day,&date[6],2);

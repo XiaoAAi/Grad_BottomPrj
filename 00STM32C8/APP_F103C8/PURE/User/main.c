@@ -1,6 +1,6 @@
 #include "bsp_common.h"
 
-char strtemp[128] = {0};
+//char strtemp[128] = {0};
 
 int main(void)
 {
@@ -25,8 +25,8 @@ int main(void)
 	TIM3_Int_Init(999, 7199);	//100ms
 	OLED_Init();//oled初始化
 	Oled_ShowTime();//显示日期时间
-	sprintf(strtemp, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, Version_Day);
-	USART_SendBytes(USART1, (u8*)strtemp, sizeof(strtemp));			//打印版本信息
+	sprintf((char*)ndat, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, Version_Day);
+	USART_SendBytess(USART1, (char *)ndat);			//打印版本信息
 	__enable_irq();
 	
 	//USART_DEBUG("disEnd\r\n");

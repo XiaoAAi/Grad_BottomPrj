@@ -14,7 +14,7 @@ typedef enum
     FALSE = 0, TRUE = 1
 } bool;
 
-extern char strtemp[128];
+//extern char strtemp[128];
 
 #include "bsp_usart.h"
 #include "bsp_gpio.h"
@@ -35,8 +35,8 @@ extern char strtemp[128];
 //版本号及前缀
 #define   Prefix            "APP_BUTTOM"    //前缀，区分不同机型
 #define   Version_Year      "19"       // year
-#define   Version_Month     "04"      // month
-#define   Version_Day       "27"      // day
+#define   Version_Month     "05"      // month
+#define   Version_Day       "02"      // day
 
 
 

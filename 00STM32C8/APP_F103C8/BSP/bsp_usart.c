@@ -42,8 +42,7 @@ void USART2_IRQHandler(void)
         nTemp = USART_ReceiveData(USART2);
         USART_ClearITPendingBit(USART2, USART_IT_RXNE); //clear flag
         /**********************************************/			
-				ATBuffer[cntAt++ ] = nTemp;//AT指令测试专用
-			if(cntAt>99)	cntAt=0;
+				ATBuffer[cntAt++] = nTemp;//AT指令测试专用
         USART_BufferWrite(nTemp);
     }
 
@@ -52,6 +51,7 @@ void USART2_IRQHandler(void)
         USART_ReceiveData(USART2);    // delete data
         USART_ClearFlag(USART2, USART_FLAG_ORE);
     }
+	
 
 }
 #endif
@@ -245,6 +245,7 @@ void USART_BufferWrite(u8 ntemp)
 //功能：主要用于指令的处理
 void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 {
+	char strtemp[50]={0};
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
 	USART_DEBUG(strtemp);
 

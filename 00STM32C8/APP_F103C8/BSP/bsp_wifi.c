@@ -12,7 +12,8 @@ u8 esp8266_check_cmd(char *str);												//检查返回的字符是否正确
 //返回值：1（成功）0（失败）
 u8 wifi_start_trans(void)
 {
-	//wifi_dis_trans();
+	wifi_dis_trans();
+
 	//设置工作模式 1：station模式   2：AP模式  3：兼容 AP+station模式
 	send_AT_cmd("AT+CWMODE=1\r\n","OK",50);
 	
@@ -67,8 +68,7 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 			}
 				
 		}
-		break;			//临时添加
-		USART_DEBUG("\r\n");
+		//USART_DEBUG("\r\n");
 		if(esp8266_check_cmd(AT_ack))
 			{
 					USART_SendBytess(USART1, "AT command ACK is Successfly\r\n");			//AT指令发送和确认成功
@@ -85,26 +85,31 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 //返回值:0,没有得到期待的应答结果;其他,期待应答结果的位置(str的位置)
 u8 esp8266_check_cmd(char *str)
 {	
-//	char *strx=0;
-//	strx=strstr((const char*)ATBuffer,(const char*)str);
-//	memset(ATBuffer, 0, sizeof(ATBuffer)); 			//清空AT接受缓冲区
-//	cntAt=0;																		//复位缓冲区计数
-//	if(strx!=NULL)
-//		return 	1;
-//	else
-//		return	0;
-	u8 i = 0;
-	u8 rval = 0;
-	char* temp_p = (char *)ATBuffer;
-	for (i = 0; i < AT_BUFFER_LEN - strlen(str); i++) {
-		rval = strncmp( temp_p + i, (const char*)str, strlen(str));
-		//rval如果为0表示相等，反之，不等
-		if (!rval)
-		{
-			return 1;
-		}
+	char *strx=0;
+	u16 i;
+	strx=strstr((const char*)ATBuffer,(const char*)str);
+	cntAt=0;																		//复位缓冲区计数
+	if(strx!=NULL)
+	return 	1;	
+	else
+	{
+		return	0;
 	}
-	return 0;	
+	memset(ATBuffer, 0, sizeof(ATBuffer)); 			//清空AT接受缓冲区
+	
+//	u8 i = 0;
+//	u8 rval = 0;
+//	char* temp_p = (char *)ATBuffer;
+//	//USART_DEBUG("dui bi \r\n");
+//	for (i = 0; i < AT_BUFFER_LEN - strlen(str); i++) {
+//		rval = strncmp( temp_p + i, (const char*)str, strlen(str));
+//		//rval如果为0表示相等，反之，不等
+//		if (!rval)
+//		{
+//			return 1;
+//		}
+//	}
+//	return 0;	
 }
 
 
@@ -135,22 +140,6 @@ u8 wifi_dis_trans(void)
 //返回值:发送数据后，服务器的返回验证码
 u8 esp8266_send_cmd(u16 *cmd,u16 waittime)
 {
-//	//u8 temp[5];
-//	char *ack;
-//	USART_SendBytess(USART2,cmd);//发送AT指令
-//	USART_DEBUG("fa song de shu ju shi:\r\n");
-//	USART_DEBUG(cmd);
-//	USART_DEBUG("\r\n");
-//	delay_ms(waittime);
-//	while(cntAt==0)
-//		{
-//		delay_ms(1000);
-//		}		
-//		ack=(char *)ATBuffer;
-//		USART_DEBUG((char *)ATBuffer);
-//		memset(ATBuffer, 0, sizeof(ATBuffer)); 
-//		cntAt=0;															//复位缓冲区计数		
-//	return (u8*)ack;
 	u8 str[8] = {0};
     u8 cnt = 0;
     u16 ncrc = 0;

@@ -350,8 +350,8 @@ void USART_BufferWrite(u8 ntemp)
             && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 5) % USART_BUFFER_LEN] == 0x00
             && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 6) % USART_BUFFER_LEN] == 0x0E && UsartBuffer[(USART_BUFFER_LEN + UsartWptr - 7) % USART_BUFFER_LEN] == 0x01)
     {
-		SendCmd(USART2, USART_SERVER_BUTTOM_ResetButtom);			//发送板子重启反馈
-		USART_SendBytes(USART1, (u8*)"ButtomLayerReset\r\n", 19);	//做打印也做延时
+		SendCmd(USART_WIFI, USART_SERVER_BUTTOM_ResetButtom);			//发送板子重启反馈
+		USART_SendBytes(USART_PC_DEBUG, (u8*)"ButtomLayerReset\r\n", 19);	//做打印也做延时
         //复位对射
         __disable_irq();
         NVIC_SystemReset();
@@ -366,7 +366,7 @@ void USART_BufferWrite(u8 ntemp)
             && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 6) % USART_BUFFER_LEN] == 0xAF && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 7) % USART_BUFFER_LEN] == 0x01)
     {
         start_flash_flag = Stop_Flash_Bod;  //结束升级
-		SendCmd(USART2, USART_SERVER_BUTTOM_StopUpdateFeedBack);			//发送板子升级结束
+		SendCmd(USART_WIFI, USART_SERVER_BUTTOM_StopUpdateFeedBack);			//发送板子升级结束
     }
 }
 
@@ -375,21 +375,21 @@ void HandleDatCmd(u16 cmd, char* dat, u16 datLen)
 {
 	char strtemp[100] = {0};
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
-	USART_SendBytess(USART1, strtemp);
+	USART_SendBytess(USART_PC_DEBUG, strtemp);
 	
 	if(cmd == USART_SERVER_BUTTOM_WillUpdate) //准备升级对射
 	{
 		flag_dis_jump = 1;
-		SendCmd(USART2, USART_SERVER_BUTTOM_WillUpdateFeedBack);
-		USART_SendBytes(USART1, (u8*)"WillUpdateButtom\r\n", 18);			//做打印也做延时
+		SendCmd(USART_WIFI, USART_SERVER_BUTTOM_WillUpdateFeedBack);
+		USART_SendBytes(USART_PC_DEBUG, (u8*)"WillUpdateButtom\r\n", 18);			//做打印也做延时
 	}
 	else if(cmd == USART_SERVER_BUTTOM_StartUpdate) // 开始升级对射
 	{
 		flag_dis_jump = 0;
 		start_flash_flag = Start_Flash_Bod;
 		IAP_Start_Program_Flash_Init();
-		SendCmd(USART2, USART_SERVER_BUTTOM_StartUpdateFeedBack);
-		USART_SendBytes(USART1, (u8*)"StartUpdateButtom\r\n", 18);
+		SendCmd(USART_WIFI, USART_SERVER_BUTTOM_StartUpdateFeedBack);
+		USART_SendBytes(USART_PC_DEBUG, (u8*)"StartUpdateButtom\r\n", 18);
 	}	
 	
 }

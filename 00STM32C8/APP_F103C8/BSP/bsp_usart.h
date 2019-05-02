@@ -4,8 +4,7 @@
 
 //串口接收队列缓存长度
 #define USART_BUFFER_LEN    		4000
-#define AT_BUFFER_LEN    				100	
-//#define	USART3_MAX_SEND_LEN			1000
+#define AT_BUFFER_LEN    				1000
 
 //红外对射--对射升级HEX版本定义DUISHE_SYS_UPDATE宏，其他版本没有定义
 #ifndef DUISHE_SYS_UPDATE
@@ -23,7 +22,7 @@
 
 
 //定义串口波特率
-#define USART1_BAUDRATE                       9600
+#define USART1_BAUDRATE                       115200
 #define USART2_BAUDRATE                       115200
 #define USART3_BAUDRATE                       9600
 

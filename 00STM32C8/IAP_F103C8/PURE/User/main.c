@@ -23,7 +23,7 @@ int main(void)
     USART_Configure();
 
     sprintf((char*)ndat, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, Version_Day);
-    USART_SendBytes(USART1, ndat, strlen((char*)ndat));
+    USART_SendBytess(USART_PC_DEBUG, (char*)ndat);
     start_flash_flag = None_Flash_Bod;
     //IAP_Reset_UpdateFLAG();
 
@@ -72,12 +72,12 @@ int main(void)
                         flag_dis_jump = 1;
                         start_flash_flag = None_Flash_Bod;
                         //Send_CMD(USART2, 0x03, LBYTE(USARTCMD_DIANJI_DUISHE_StopUpdateDuishe));
-                        USART_SendBytess(USART1, "StopUpdateButtom\r\n");
+                        USART_SendBytess(USART_PC_DEBUG, "StopUpdateButtom\r\n");
                         //for(i = 0; i < 20 * 1024; i = i + 4)
                         //{
                         //memset(strtemp, 0, sizeof(strtemp));
                         //sprintf((char *)strtemp, "%08x ", *(__IO uint32_t*)(FLASH_APP_ADDRESS + i));
-                        //USART_SendBytess(USART1, (char *)strtemp);
+                        //USART_SendBytess(USART_PC_DEBUG, (char *)strtemp);
                         //}
                         //IAP_Write_UpdateFLAG();
                         __disable_irq();
