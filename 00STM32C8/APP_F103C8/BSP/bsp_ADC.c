@@ -1,4 +1,4 @@
-
+#include "bsp_adc.h"
 
 static void RCC_ConfigInitail()
 {
@@ -28,7 +28,7 @@ static void RCC_ConfigInitail()
     }
 }
 
-void ADC_config()
+void ADC1_config()
 {
 	ADC_InitTypeDef ADC_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -60,7 +60,11 @@ void ADC_config()
 
 	ADC_StartCalibration(ADC1);//开始校准
 	while(ADC_GetCalibrationStatus(ADC1));//等待校准完成
-
+//ADC_Channel_5是通道，ADC_SampleTime_1Cycles5是设置周期的参数
+//周期计算；如下面ADC_SampleTime_1Cycles5就是1.5个周期，所以一共12.5 + 1.5 = 14个周期 
+//ADC时钟频率14KHZ / 14 = 1MHz，这样我们就能得到1MHz最大的采样率了
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 1, ADC_SampleTime_1Cycles5);
 
 }
+
+

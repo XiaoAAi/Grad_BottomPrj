@@ -17,7 +17,7 @@ int main(void)
     //__enable_irq();
 #endif
 	__disable_irq();
-    delay_init();            //延时函数初始化
+    delay_init();            //延时函数初始化 
     GPIO_Configure();
     USART_Configure();
     NVIC_Configure();
@@ -29,7 +29,6 @@ int main(void)
 	USART_SendBytes(USART1, (u8*)strtemp, sizeof(strtemp));			//打印版本信息
 	__enable_irq();
 	
-	wifi_dis_trans();
 	//USART_DEBUG("disEnd\r\n");
 	if(wifi_start_trans())		//WIFI 透传打开	
 	{

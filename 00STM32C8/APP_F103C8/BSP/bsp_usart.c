@@ -4,7 +4,6 @@
 bool flagEnableDebug = TRUE;									//DEBUG打印
 u8 UsartBuffer[USART_BUFFER_LEN] = {0}; 			//数据缓冲区
 u8 ATBuffer[AT_BUFFER_LEN] = {0}; 					//数据缓冲区
-u8  USART3_TX_BUF[USART3_MAX_SEND_LEN]; 			//发送缓冲,最大USART3_MAX_SEND_LEN字节(这句不可以删不知道）
 u16 UsartWptr = 0;
 u16 UsartRptr = 0;
 u8 cntAt = 0;																	//WiFi缓冲计数
@@ -43,7 +42,8 @@ void USART2_IRQHandler(void)
         nTemp = USART_ReceiveData(USART2);
         USART_ClearITPendingBit(USART2, USART_IT_RXNE); //clear flag
         /**********************************************/			
-				ATBuffer[(cntAt++ % AT_BUFFER_LEN)] = nTemp;//AT指令测试专用
+				ATBuffer[cntAt++ ] = nTemp;//AT指令测试专用
+			if(cntAt>99)	cntAt=0;
         USART_BufferWrite(nTemp);
     }
 

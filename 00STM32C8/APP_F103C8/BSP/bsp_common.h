@@ -24,7 +24,7 @@ extern char strtemp[128];
 #include "bsp_oled.h"
 #include "bsp_wifi.h"
 #include "bsp_dht22.h"
-
+#include "bsp_adc.h"
 
 #define HBYTE(a)               ((unsigned char)(((unsigned short)(a) >> 8) & 0xFF))
 #define LBYTE(a)               ((unsigned char)((unsigned short)(a)& 0xff))

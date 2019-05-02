@@ -29,7 +29,6 @@
 void USART_Configure(void);
 void GPIO_Configure(void);
 void NVIC_Configure(void);
-void GPIOB_set(uint16_t pin,u8 state);
 void OLED_SpiInit(void);
 void EXTIX_Init(void);
 

@@ -15,7 +15,7 @@ void GPIO_Configure(void)
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 	GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 	//B端口输出引脚
-	//DHT22温湿度传感器引脚B8  	风扇引脚时B3  房间灯B4 门锁B9(低电平触发)
+	//DHT22温湿度传感器引脚B8  	风扇引脚时B3 门锁B9(低电平触发)
 	//OLED引脚配置GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15
 	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8|GPIO_Pin_9|GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -23,8 +23,10 @@ void GPIO_Configure(void)
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	GPIO_SetBits(GPIOB,GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_8);//设置为高电平
 	//GPIO_ResetBits(GPIOB, GPIO_Pin_9);
+	
 	//A端口输出
-	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8|GPIO_Pin_7|GPIO_Pin_1|GPIO_Pin_0;//A8引脚用于OLED。A7用于人体传感器指示灯 A1 接蜂鸣器
+	//A8引脚用于OLED。A7用于人体传感器指示灯 A1 接蜂鸣器  房间灯A0
+	GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8|GPIO_Pin_7|GPIO_Pin_1|GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
@@ -66,14 +68,7 @@ void OLED_SpiInit(void)
   SPI_Cmd(SPI2, ENABLE); //使能SPI外设
 	
 }
-void GPIOB_set(uint16_t pin,u8 state)
-{
-	if(state==1)
-		GPIO_SetBits(GPIOB,pin);//设置为高电平
-	else
-		if(state==0)
-			GPIO_ResetBits(GPIOB,pin);//设置为低电平
-}
+
 
 //功能：串口初始化程序
 void USART_Configure(void)
@@ -210,14 +205,31 @@ void NVIC_Configure(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //IRQ通道被使能
     NVIC_Init(&NVIC_InitStructure);  //根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器
 #endif
+
+#if EXTI_CONFIG_ENABLED > 0
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;             //A4中断
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;   //先占优先级1级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;          //从优先级3级
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //IRQ通道被使能
+    NVIC_Init(&NVIC_InitStructure);  //根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器
+#endif
 }
 
 void EXTIX_Init(void)
 {
+	//人体传感器中断
 	EXTI_InitTypeDef EXTI_initStructure;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);//使能AFIO复用时钟功能：	
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA,GPIO_PinSource4);
 	EXTI_initStructure.EXTI_Line=EXTI_Line4;
+	EXTI_initStructure.EXTI_Mode = EXTI_Mode_Interrupt;//中断模式，可选值为中断 EXTI_Mode_Interrupt 和事件 EXTI_Mode_Event。
+	EXTI_initStructure.EXTI_Trigger = EXTI_Trigger_Rising;//触发方式，可以是下降沿触发 EXTI_Trigger_Falling，上升沿触发 EXTI_Trigger_Rising，或者任意电平（上升沿和下降沿）触发EXTI_Trigger_Rising_Falling
+	EXTI_initStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_initStructure);//根据结构体信息进行初始化
+	
+	//光线传感器中断
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB,GPIO_PinSource5);
+	EXTI_initStructure.EXTI_Line=EXTI_Line5;
 	EXTI_initStructure.EXTI_Mode = EXTI_Mode_Interrupt;//中断模式，可选值为中断 EXTI_Mode_Interrupt 和事件 EXTI_Mode_Event。
 	EXTI_initStructure.EXTI_Trigger = EXTI_Trigger_Rising;//触发方式，可以是下降沿触发 EXTI_Trigger_Falling，上升沿触发 EXTI_Trigger_Rising，或者任意电平（上升沿和下降沿）触发EXTI_Trigger_Rising_Falling
 	EXTI_initStructure.EXTI_LineCmd = ENABLE;
@@ -230,6 +242,17 @@ void EXTI4_IRQHandler(void)
 	Human_body_Light_ON;
 	cntHuman_light=0;
   EXTI_ClearITPendingBit(EXTI_Line4);//清楚中断标志
+}
+
+//外部引脚A4中断服务例程
+void EXTI9_5_IRQHandler(void)
+{
+	if(light_sensor_port)
+		
+	USART_DEBUG("H\n");
+	else
+		USART_DEBUG("L\n");
+  EXTI_ClearITPendingBit(EXTI_Line5);//清楚中断标志
 }
 
 

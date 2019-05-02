@@ -12,7 +12,7 @@ u8 esp8266_check_cmd(char *str);												//检查返回的字符是否正确
 //返回值：1（成功）0（失败）
 u8 wifi_start_trans(void)
 {
-	wifi_dis_trans();
+	//wifi_dis_trans();
 	//设置工作模式 1：station模式   2：AP模式  3：兼容 AP+station模式
 	send_AT_cmd("AT+CWMODE=1\r\n","OK",50);
 	
@@ -67,6 +67,7 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 			}
 				
 		}
+		break;			//临时添加
 		USART_DEBUG("\r\n");
 		if(esp8266_check_cmd(AT_ack))
 			{
@@ -92,7 +93,6 @@ u8 esp8266_check_cmd(char *str)
 //		return 	1;
 //	else
 //		return	0;
-
 	u8 i = 0;
 	u8 rval = 0;
 	char* temp_p = (char *)ATBuffer;
