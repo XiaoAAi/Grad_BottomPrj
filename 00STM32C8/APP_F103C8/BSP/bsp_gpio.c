@@ -249,9 +249,14 @@ void EXTI9_5_IRQHandler(void)
 {
 	if(light_sensor_port)
 		
-	USART_DEBUG("H\n");
+	{USART_DEBUG("light H\n");
+	Home_light=0;
+	}
 	else
-		USART_DEBUG("L\n");
+	{
+		USART_DEBUG("Light L\n");
+		Home_light=1;
+	}
   EXTI_ClearITPendingBit(EXTI_Line5);//清楚中断标志
 }
 

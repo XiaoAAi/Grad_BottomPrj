@@ -51,7 +51,6 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 	while(c>0)
 	{
 		c--;
-		//strcat(AT_cmd," \r\n");
 		USART_SendBytess(USART2,AT_cmd);//发送AT指令
 		USART_SendBytess(USART2,"\r\n");
 		USART_DEBUG(AT_cmd);

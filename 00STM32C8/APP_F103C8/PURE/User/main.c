@@ -33,6 +33,7 @@ int main(void)
 	if(wifi_start_trans())		//WIFI 透传打开	
 	{
 		USART_DEBUG("wifi success\r\n");
+		OLED_P8x16Str(5,6,"connect server");
 	}
 	TIM_Cmd(TIM3, ENABLE);
 	

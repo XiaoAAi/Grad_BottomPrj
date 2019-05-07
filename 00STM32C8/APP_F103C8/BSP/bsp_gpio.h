@@ -13,8 +13,8 @@
 #define  LED_SWITCH()	 	(GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13) ? LED_CLOSE : LED_OPEN)
 #define EXTI_CONFIG_ENABLED    	(1)//引脚中断触发
 
-#define 	Human_body_Light_ON 						PAout(7)=1		//人体传感器小灯开
-#define 	Human_body_Light_OFF  					PAout(7)=0		//人体传感器小灯关
+#define 	Human_body_Light_ON 						PAout(7)=1		//人体传感器指示灯开
+#define 	Human_body_Light_OFF  					PAout(7)=0		//人体传感器指示灯关
 #define 	DoorLockOpen										PBout(9)=1		//开门锁
 #define 	DoorLockClose										PBout(9)=0		//开门锁
 
