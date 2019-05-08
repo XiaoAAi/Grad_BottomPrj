@@ -9,6 +9,7 @@ u16 UsartRptr = 0;
 u8 cntAt = 0;																	//WiFi缓冲计数
 u8 Lock_flag=0;
 
+bool flagUpdate = FALSE;
 
 //功能：串口1接PC机
 #if USART1_CONFIG_ENABLED > 0
@@ -42,7 +43,7 @@ void USART2_IRQHandler(void)
         nTemp = USART_ReceiveData(USART2);
         USART_ClearITPendingBit(USART2, USART_IT_RXNE); //clear flag
         /**********************************************/			
-//				ATBuffer[cntAt++] = nTemp;//AT指令测试专用
+		ATBuffer[cntAt++] = nTemp;//AT指令测试专用
         USART_BufferWrite(nTemp);
     }
 
@@ -240,6 +241,23 @@ void USART_BufferWrite(u8 ntemp)
     }
 
     UsartWptr = (UsartWptr + 1) % USART_BUFFER_LEN;
+	
+#ifdef  UPDATA_TEST	
+	//升级结束
+    if(UsartBuffer[UsartRptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 1) % USART_BUFFER_LEN] == 0xDD
+            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 2) % USART_BUFFER_LEN] == 0x38 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 3) % USART_BUFFER_LEN] == 0xB0
+            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 5) % USART_BUFFER_LEN] == 0x00
+            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 6) % USART_BUFFER_LEN] == 0xAF && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 7) % USART_BUFFER_LEN] == 0x01)
+    {
+		char ndat[50] = {0};
+		USART_SendBytess(USART1, "StopUpdateButtom ");
+		sprintf(ndat, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, "08");
+		USART_SendBytess(USART1, ndat);			//打印版本信息
+		SendCmd(USART2, USART_SERVER_BUTTOM_StopUpdateFeedBack);			//发送板子升级结束
+		TIM_Cmd(TIM3, ENABLE);	
+    }	
+#endif
+	
 }
 
 //功能：主要用于指令的处理
@@ -248,15 +266,27 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	char strtemp[50]={0};
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
 	USART_DEBUG(strtemp);
-
+	
+#ifdef  UPDATA_TEST	
 	if(cmd == USART_SERVER_BUTTOM_WillUpdate) //准备升级对射
 	{
+		char str[50] = "IAP_BUTTOM-19.0265\r\n";	
 		SendCmd(USART2, USART_SERVER_BUTTOM_WillUpdateFeedBack);
 		USART_SendBytes(USART1, (u8*)"WillUpdateButtom\r\n", 18);			//做打印也做延时
-		IAP_Reset_UpdateFLAG();
-		__disable_irq();
-		NVIC_SystemReset();
+		delay_ms(500);
+		USART_SendBytess(USART1, str);
+		flagUpdate = TRUE;
+		TIM_Cmd(TIM3, DISABLE);		
+	}	
+	else if(cmd == USART_SERVER_BUTTOM_StartUpdate) // 开始升级对射
+	{
+		delay_ms(800);
+		USART_SendBytess(USART1, "StartUpdateButtom\r\n");
+		SendCmd(USART2, USART_SERVER_BUTTOM_StartUpdateFeedBack);
 	}
+	
+#endif
+	
 	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
 	{
 		char send_cmd[2]={0xAA};

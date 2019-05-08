@@ -1,4 +1,5 @@
 #include "bsp_common.h"
+
 char test[20]={0};
 //u16 Humidity=0,Temperature=0;
 //u16 old_Humidity=0,old_Temperature=0;
@@ -127,17 +128,29 @@ void oled_DHT22(u16 Humidity,u16 Temperature)
 	u8 Humidity_L=Humidity%10;
 	Temperature/=10;
 	Humidity/=10;
-		if(Temperature>=25)		
+	if(Temperature>=25)		
+	{
+		if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_3) == 0)
 		{
-			fen_out=1;	//湿度大打开风扇
+			char send_cmd[2] = {0xAA};
+			fen_out=1;		//打开风扇		
+			SendCmdDat(USART2,USART_BUTTOM_SERVER_FanFeedback,send_cmd,1);
+			delay_ms(200);
 			if(Temperature>30)
-					Buzzer_potr=0;		//蜂鸣器打开		
-		}								
-		else
+					Buzzer_potr=0;		//蜂鸣器打开				
+		}
+
+	}								
+	else
+	{
+		if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_3) == 1)
 		{
-			fen_out=0;				//关闭风扇
-			Buzzer_potr=1;		//蜂鸣器关闭						
-		}											
+			char send_cmd[2]={0xBB};
+			fen_out=0;		//关闭风扇
+			SendCmdDat(USART2,USART_BUTTOM_SERVER_FanFeedback,send_cmd,1);
+			Buzzer_potr=1;		//蜂鸣器关闭	
+		}			
+	}											
 //	}
 	//OLED显示DHT22温湿度
 	OLED_P8x16Str(0,6,(u8 *)"T:");	

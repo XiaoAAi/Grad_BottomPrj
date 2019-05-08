@@ -16,12 +16,78 @@ void TIM2_Int_Init(u16 arr, u16 psc)
 	
     TIM_Cmd(TIM2, ENABLE);  //使能TIMx外设
 }
-
-//功能：定时器2中断服务程序
+extern bool flagOpenLight;
+extern bool flagCloseLight;
+u8 cntLightDly = 0;
+u8 cntLightClr  = 0;
+bool flagBodyOpenTime = FALSE;
+u16 cntSmoke = 0;
+u8 cntBuzzer = 0;
+//功能：定时器2中断服务程序  10ms
 void TIM2_IRQHandler(void)   //TIM3中断
 {
     if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)  //检查指定的TIM中断发生与否:TIM 中断源
     {
+		if(flagOpenLight == TRUE && light_sensor_port != 1)
+		{
+			cntLightClr = 0;
+			if(cntLightDly++ >= 100)
+			{
+				char send_cmd[2]={0xBB};
+				SendCmdDat(USART2,USART_BUTTOM_SERVER_LightFeedback,send_cmd,1);
+				cntLightDly = 0;
+				Home_light = 0;		//关灯
+				flagOpenLight = FALSE;
+				flagCloseLight = FALSE;
+				USART_DEBUG("open light\r\n");
+			}
+		}
+		
+		if(flagCloseLight == TRUE && light_sensor_port == 1)
+		{
+			cntLightClr = 0;
+			if(cntLightDly++ >= 100)
+			{
+				char send_cmd[2]={0xAA};
+				SendCmdDat(USART2,USART_BUTTOM_SERVER_LightFeedback,send_cmd,1);		
+				cntLightDly = 0;
+				Home_light = 1;		//开灯
+				flagOpenLight = FALSE;
+				flagCloseLight = FALSE;
+				USART_DEBUG("Close light\r\n");
+			}			
+		}
+		
+		if(cntLightClr++ >= 150)
+		{
+			cntLightClr = 0;
+			cntLightDly = 0;
+			flagOpenLight = FALSE;
+			flagCloseLight = FALSE;
+		}
+		
+		
+		
+		if(cntSmoke++ >= 50)
+		{
+			cntSmoke = 0;
+			if(GetAdcValue(ADC_Channel_5) >= 1000)
+			{
+				USART_DEBUG("Smokeing\r\n");
+				Buzzer_potr = 0;
+			}
+		}
+		
+		if(Buzzer_potr == 0)
+		{
+			if(cntBuzzer++ >= 200)
+			{
+				cntBuzzer = 0;
+				Buzzer_potr = 1;
+			}
+		}
+		
+		
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update);    //清除TIMx的中断待处理位:TIM 中断源
 	}
 }
@@ -49,7 +115,7 @@ void TIM3_Int_Init(u16 arr, u16 psc)
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //根据TIM_TimeBaseInitStruct中指定的参数初始化TIMx的时间基数单位
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE); //使能指定的TIM3中断,允许更新中断
 	
-		TIM_Cmd(TIM3, DISABLE);  
+	TIM_Cmd(TIM3, ENABLE);  
 
 }
 
@@ -57,6 +123,9 @@ void TIM3_Int_Init(u16 arr, u16 psc)
 //功能：定时器3中断服务程序
 void TIM3_IRQHandler(void)   //TIM3中断
 {
+//	char strtemp[50] = {0};
+//	sprintf(strtemp, "Body:%d\r\n", PAin(4));
+//	USART_DEBUG(strtemp);
     if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)  //检查指定的TIM中断发生与否:TIM 中断源
     {
 		if(cnt_time++>10)	//1秒
@@ -100,14 +169,15 @@ void TIM3_IRQHandler(void)   //TIM3中断
 		if(cntHuman_light++ > 30)//3秒
 		{
 			cntHuman_light = 0;
-			Human_body_Light_OFF;			
-		}
+			Human_body_Light_OFF;
+		}		
+
 		if(cnt_date_time++ >600)//1分钟
 		{			
 			SendCmd(USART2,USART_BUTTOM_SERVER_Date);//获取时间
 			cnt_date_time=0;
 		}
-		
+				
         TIM_ClearITPendingBit(TIM3, TIM_IT_Update);    //清除TIMx的中断待处理位:TIM 中断源
 	}
 }

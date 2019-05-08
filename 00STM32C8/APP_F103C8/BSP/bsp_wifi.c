@@ -84,16 +84,16 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 //返回值:0,没有得到期待的应答结果;其他,期待应答结果的位置(str的位置)
 u8 esp8266_check_cmd(char *str)
 {	
-//	char *strx=0;
-//	strx=strstr((const char*)ATBuffer,(const char*)str);
-//	cntAt=0;																		//复位缓冲区计数
-//	if(strx!=NULL)
-//	return 	1;	
-//	else
-//	{
-//		return	0;
-//	}
-	return 1;
+	char *strx=0;
+	strx=strstr((const char*)ATBuffer,(const char*)str);
+	cntAt=0;																		//复位缓冲区计数
+	if(strx!=NULL)
+	return 	1;	
+	else
+	{
+		return	0;
+	}
+//	return 1;
 	
 //	u8 i = 0;
 //	u8 rval = 0;

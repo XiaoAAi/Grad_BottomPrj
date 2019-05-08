@@ -1,7 +1,6 @@
 #include "bsp_common.h"
 
 
-extern	u8 cntHuman_light;				//人体开关小灯计数器
 void GPIO_Configure(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -223,7 +222,7 @@ void EXTIX_Init(void)
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA,GPIO_PinSource4);
 	EXTI_initStructure.EXTI_Line=EXTI_Line4;
 	EXTI_initStructure.EXTI_Mode = EXTI_Mode_Interrupt;//中断模式，可选值为中断 EXTI_Mode_Interrupt 和事件 EXTI_Mode_Event。
-	EXTI_initStructure.EXTI_Trigger = EXTI_Trigger_Rising;//触发方式，可以是下降沿触发 EXTI_Trigger_Falling，上升沿触发 EXTI_Trigger_Rising，或者任意电平（上升沿和下降沿）触发EXTI_Trigger_Rising_Falling
+	EXTI_initStructure.EXTI_Trigger = EXTI_Trigger_Rising;//触发方式，可以是上升沿触发 EXTI_Trigger_Falling，上升沿触发 EXTI_Trigger_Rising，或者任意电平（上升沿和下降沿）触发EXTI_Trigger_Rising_Falling
 	EXTI_initStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_initStructure);//根据结构体信息进行初始化
 	
@@ -231,33 +230,48 @@ void EXTIX_Init(void)
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB,GPIO_PinSource5);
 	EXTI_initStructure.EXTI_Line=EXTI_Line5;
 	EXTI_initStructure.EXTI_Mode = EXTI_Mode_Interrupt;//中断模式，可选值为中断 EXTI_Mode_Interrupt 和事件 EXTI_Mode_Event。
-	EXTI_initStructure.EXTI_Trigger = EXTI_Trigger_Rising;//触发方式，可以是下降沿触发 EXTI_Trigger_Falling，上升沿触发 EXTI_Trigger_Rising，或者任意电平（上升沿和下降沿）触发EXTI_Trigger_Rising_Falling
+	EXTI_initStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;//触发方式，可以是上升沿触发 EXTI_Trigger_Falling，上升沿触发 EXTI_Trigger_Rising，或者任意电平（上升沿和下降沿）触发EXTI_Trigger_Rising_Falling
 	EXTI_initStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_initStructure);//根据结构体信息进行初始化
 	
 }
-//外部引脚A4中断服务例程
+
+extern u8 cntHuman_light;
+//外部引脚A4中断服务例程  人体传感器
 void EXTI4_IRQHandler(void)
 {
-	Human_body_Light_ON;
-	cntHuman_light=0;
-  EXTI_ClearITPendingBit(EXTI_Line4);//清楚中断标志
+	if(EXTI_GetITStatus(EXTI_Line4) != RESET)
+	{
+		if(BODY_SENSOR == 1)
+		{
+			Human_body_Light_ON;
+			cntHuman_light = 0;
+			EXTI_ClearITPendingBit(EXTI_Line4);//清楚中断标志			
+		}
+	}
+
 }
 
+bool flagOpenLight = FALSE;
+bool flagCloseLight = FALSE;
 //外部引脚A4中断服务例程
 void EXTI9_5_IRQHandler(void)
 {
-	if(light_sensor_port)
-		
-	{USART_DEBUG("light H\n");
-	Home_light=0;
-	}
-	else
+	if(EXTI_GetITStatus(EXTI_Line5) != RESET)
 	{
-		USART_DEBUG("Light L\n");
-		Home_light=1;
+		if(light_sensor_port)	//不需要光	
+		{
+			USART_DEBUG("C");
+			flagCloseLight = TRUE;
+		}
+		else	//需要光
+		{
+			USART_DEBUG("O");
+			flagOpenLight = TRUE;
+		}
+		EXTI_ClearITPendingBit(EXTI_Line5);//清楚中断标志	
 	}
-  EXTI_ClearITPendingBit(EXTI_Line5);//清楚中断标志
+
 }
 
 
