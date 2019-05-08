@@ -14,11 +14,11 @@
 
 //定义串口波特率
 #define USART1_BAUDRATE                       115200
-#define USART2_BAUDRATE                       9600
+#define USART2_BAUDRATE                       115200
 #define USART3_BAUDRATE                       9600
 
-#define USART_PC_DEBUG			USART2
-#define USART_WIFI					USART1
+#define USART_PC_DEBUG			USART1
+#define USART_WIFI				USART2
 
 /**********************************************************/
 #define None_Flash_Bod        0

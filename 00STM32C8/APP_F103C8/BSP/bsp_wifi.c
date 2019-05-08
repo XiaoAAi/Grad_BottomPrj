@@ -18,8 +18,8 @@ u8 wifi_start_trans(void)
 	send_AT_cmd("AT+CWMODE=1\r\n","OK",50);
 	
 	//让模块连接上自己的路由
-	//send_AT_cmd("AT+CWJAP=\"ZNHL\",\"ZnHl@4501.\"","WIFI CONNECTED",1000);
-	send_AT_cmd("AT+CWJAP=\"xiaomi5\",\"123456789\"","WIFI CONNECTED",1000);
+	send_AT_cmd("AT+CWJAP=\"ZNHL\",\"ZnHl@4501.\"","WIFI CONNECTED",1000);
+	//send_AT_cmd("AT+CWJAP=\"xiaomi5\",\"123456789\"","WIFI CONNECTED",1000);
 	
 	//=0：单路连接模式     =1：多路连接模式
 	send_AT_cmd("AT+CIPMUX=0","OK",50);
@@ -84,17 +84,16 @@ u8 send_AT_cmd(char *AT_cmd,char *AT_ack,u16 waittime)
 //返回值:0,没有得到期待的应答结果;其他,期待应答结果的位置(str的位置)
 u8 esp8266_check_cmd(char *str)
 {	
-	char *strx=0;
-	u16 i;
-	strx=strstr((const char*)ATBuffer,(const char*)str);
-	cntAt=0;																		//复位缓冲区计数
-	if(strx!=NULL)
-	return 	1;	
-	else
-	{
-		return	0;
-	}
-	memset(ATBuffer, 0, sizeof(ATBuffer)); 			//清空AT接受缓冲区
+//	char *strx=0;
+//	strx=strstr((const char*)ATBuffer,(const char*)str);
+//	cntAt=0;																		//复位缓冲区计数
+//	if(strx!=NULL)
+//	return 	1;	
+//	else
+//	{
+//		return	0;
+//	}
+	return 1;
 	
 //	u8 i = 0;
 //	u8 rval = 0;

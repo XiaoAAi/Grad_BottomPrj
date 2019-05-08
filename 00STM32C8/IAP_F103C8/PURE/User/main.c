@@ -81,6 +81,7 @@ int main(void)
                         //}
                         //IAP_Write_UpdateFLAG();
                         __disable_irq();
+						USART_Cmd(USART2, DISABLE);
                         IAP_JumpToApplication();
                     }
                 }

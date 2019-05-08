@@ -14,7 +14,7 @@ int main(void)
 	
 #if SYS_ENABLE_IAP
     SCB->VTOR = 0x8002000;
-    //__enable_irq();
+    __enable_irq();
 #endif
 	__disable_irq();
     delay_init();            //延时函数初始化 
@@ -33,7 +33,7 @@ int main(void)
 	if(wifi_start_trans())		//WIFI 透传打开	
 	{
 		USART_DEBUG("wifi success\r\n");
-		OLED_P8x16Str(5,6,"connect server");
+		OLED_P8x16Str(5, 2, (u8*)"connect server");
 	}
 	TIM_Cmd(TIM3, ENABLE);
 	

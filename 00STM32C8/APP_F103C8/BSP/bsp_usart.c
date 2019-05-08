@@ -42,7 +42,7 @@ void USART2_IRQHandler(void)
         nTemp = USART_ReceiveData(USART2);
         USART_ClearITPendingBit(USART2, USART_IT_RXNE); //clear flag
         /**********************************************/			
-				ATBuffer[cntAt++] = nTemp;//AT指令测试专用
+//				ATBuffer[cntAt++] = nTemp;//AT指令测试专用
         USART_BufferWrite(nTemp);
     }
 
@@ -274,8 +274,10 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	}
 	else if(cmd==USART_SERVER_BUTTOM_LCDShow)	//LED显示
 	{
+		char nclr[50] = "                    ";
+		OLED_P8x16Str(5, 2, (u8*)nclr);
 		dat[datLen+1]='\0';
-		OLED_P8x16Str(0,0,dat);
+		OLED_P8x16Str(0,2,dat);
 		USART_DEBUG("OLEDshow\r\n");
 		SendCmd(USART2, USART_BUTTOM_SERVER_Oledshowback);	//oled反馈
 	}

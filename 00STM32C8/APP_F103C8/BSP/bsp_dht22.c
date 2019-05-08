@@ -142,11 +142,11 @@ void oled_DHT22(u16 Humidity,u16 Temperature)
 	//OLEDÏÔÊ¾DHT22ÎÂÊª¶È
 	OLED_P8x16Str(0,6,(u8 *)"T:");	
 	OLED_Print_Num(20,6,Temperature);
-	OLED_Print_Num(40,6,Temperature_L);
-	OLED_P8x16Str(50,6,"`C");
-	OLED_P8x16Str(80,6,"H:");
-	OLED_Print_Num(100,6,Humidity);
-	OLED_Print_Num(120,6,Humidity_L);
-	OLED_P8x16Str(140,6,"%");
+	OLED_Print_Num1(38,7,Temperature_L);
+	//OLED_P8x16Str(50,6,"`C");
+	OLED_P8x16Str(65,6,"H:");
+	OLED_Print_Num(85,6,Humidity);
+	OLED_Print_Num1(103,7,Humidity_L);
+	//OLED_P8x16Str(120,6,"%");
 }
 
