@@ -36,7 +36,7 @@ typedef enum
 #define   Prefix            "APP_BUTTOM"    //前缀，区分不同机型
 #define   Version_Year      "19"       // year
 #define   Version_Month     "05"      // month
-#define   Version_Day       "02"      // day
+#define   Version_Day       "08"      // day
 
 
 
