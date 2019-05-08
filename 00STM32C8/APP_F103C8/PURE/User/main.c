@@ -11,7 +11,6 @@ int main(void)
 	u8 ndat[512] = {0};
 	u16 ncrc = 0;
 	u16 ncmd = 0;
-	
 #if SYS_ENABLE_IAP
     SCB->VTOR = 0x8002000;
     __enable_irq();
@@ -21,13 +20,15 @@ int main(void)
     GPIO_Configure();
     USART_Configure();
     NVIC_Configure();
-	EXTIX_Init();//外部引脚中断初始化
-	TIM3_Int_Init(999, 7199);	//100ms
 	OLED_Init();//oled初始化
 	Oled_ShowTime();//显示日期时间
+	Adc_Init();
+	__enable_irq();
+	
+	delay_ms(800);
 	sprintf((char*)ndat, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, Version_Day);
 	USART_SendBytess(USART1, (char *)ndat);			//打印版本信息
-	__enable_irq();
+	
 	
 	//USART_DEBUG("disEnd\r\n");
 	if(wifi_start_trans())		//WIFI 透传打开	
@@ -35,11 +36,12 @@ int main(void)
 		USART_DEBUG("wifi success\r\n");
 		OLED_P8x16Str(5, 2, (u8*)"connect server");
 	}
-	TIM_Cmd(TIM3, ENABLE);
-	
+	delay_ms(500);
+	EXTIX_Init();//外部引脚中断初始化
+	TIM2_Int_Init(99, 7199);	//10ms
+	TIM3_Int_Init(999, 7199);	//100ms
 	
 #if SYS_ENABLE_IAP
-
     if(IAP_Read_UpdateFLAG() != 1)
     {
         IAP_Write_UpdateFLAG();

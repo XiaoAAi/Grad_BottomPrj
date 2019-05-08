@@ -242,21 +242,6 @@ void USART_BufferWrite(u8 ntemp)
 
     UsartWptr = (UsartWptr + 1) % USART_BUFFER_LEN;
 	
-#ifdef  UPDATA_TEST	
-	//升级结束
-    if(UsartBuffer[UsartRptr] == 0xEE && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 1) % USART_BUFFER_LEN] == 0xDD
-            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 2) % USART_BUFFER_LEN] == 0x38 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 3) % USART_BUFFER_LEN] == 0xB0
-            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 4) % USART_BUFFER_LEN] == 0x02 && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 5) % USART_BUFFER_LEN] == 0x00
-            && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 6) % USART_BUFFER_LEN] == 0xAF && UsartBuffer[(USART_BUFFER_LEN + UsartRptr - 7) % USART_BUFFER_LEN] == 0x01)
-    {
-		char ndat[50] = {0};
-		USART_SendBytess(USART1, "StopUpdateButtom ");
-		sprintf(ndat, "%s-%s.%s%s\r\n", Prefix, Version_Year, Version_Month, "08");
-		USART_SendBytess(USART1, ndat);			//打印版本信息
-		SendCmd(USART2, USART_SERVER_BUTTOM_StopUpdateFeedBack);			//发送板子升级结束
-		TIM_Cmd(TIM3, ENABLE);	
-    }	
-#endif
 	
 }
 
@@ -267,25 +252,14 @@ void HandleDatCmd(u16 cmd, u8* dat, u16 datLen)
 	sprintf(strtemp, "Cmd: %X\r\n", cmd);
 	USART_DEBUG(strtemp);
 	
-#ifdef  UPDATA_TEST	
 	if(cmd == USART_SERVER_BUTTOM_WillUpdate) //准备升级对射
 	{
-		char str[50] = "IAP_BUTTOM-19.0265\r\n";	
 		SendCmd(USART2, USART_SERVER_BUTTOM_WillUpdateFeedBack);
 		USART_SendBytes(USART1, (u8*)"WillUpdateButtom\r\n", 18);			//做打印也做延时
-		delay_ms(500);
-		USART_SendBytess(USART1, str);
-		flagUpdate = TRUE;
-		TIM_Cmd(TIM3, DISABLE);		
-	}	
-	else if(cmd == USART_SERVER_BUTTOM_StartUpdate) // 开始升级对射
-	{
-		delay_ms(800);
-		USART_SendBytess(USART1, "StartUpdateButtom\r\n");
-		SendCmd(USART2, USART_SERVER_BUTTOM_StartUpdateFeedBack);
-	}
-	
-#endif
+		IAP_Reset_UpdateFLAG();
+		__disable_irq();
+		NVIC_SystemReset();
+	}		
 	
 	else if(cmd == USART_SERVER_BUTTOM_OpenLight)			//开灯指令
 	{
